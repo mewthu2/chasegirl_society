@@ -12,7 +12,7 @@
         <span><%= pend.positive? ? "#{pend} em análise" : (statement.channel_met?(kind) ? "Cumprido" : "Faltam #{[goal - done, 0].max}") %></span>
       </div>
       <% if local_assigns[:upload_link] %>
-        <%= link_to upload_link.call(kind), class: "btn btn-secondary btn-sm btn-block", style: "margin-top:12px" do %><%= icon("camera") %>Comprovar <%= Influencer.channel_label(kind) %><% end %>
+        <%= link_to upload_link.call(kind), class: "btn btn-secondary btn-sm btn-block", style: "margin-top:12px" do %><%= icon("camera") %>Comprovar <%= Influencer.channel_label(kind) %><% nxt = done + pend + 1 %><%= " · #{nxt} de #{goal}" if nxt <= goal %><% end %>
       <% end %>
     </div>
   <% end %>

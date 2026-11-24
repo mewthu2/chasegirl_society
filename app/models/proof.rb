@@ -1,7 +1,7 @@
 class Proof < ApplicationRecord
   STATUSES = %w[pending approved rejected].freeze
   STATUS_LABELS = { "pending" => "Em análise", "approved" => "Aprovada", "rejected" => "Recusada" }.freeze
-  MAX_IMAGES = 10
+  MAX_IMAGES = 15
 
   belongs_to :influencer
   belongs_to :submitted_by, class_name: "User", optional: true
@@ -13,7 +13,6 @@ class Proof < ApplicationRecord
   validates :kind, inclusion: { in: Influencer::CHANNELS }
   validates :status, inclusion: { in: STATUSES }
   validates :month, presence: true
-  validates :quantity, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 30 }
   validates :link, presence: { message: "da publicação é obrigatório" }
   validates :link, format: { with: %r{\Ahttps?://}i, message: "precisa começar com http:// ou https://" }, allow_blank: true
   validate :evidence_present
@@ -52,8 +51,8 @@ class Proof < ApplicationRecord
 
   def normalize_month
     self.link = link.to_s.strip.presence && (link.strip.match?(%r{\Ahttps?://}i) ? link.strip : "https://#{link.strip}")
-    # Sem quantidade informada: em Stories conta 1 por foto enviada; nos demais, 1.
-    self.quantity = (kind == "stories" && images.attached? ? [images.size, 1].max : 1) if quantity.blank?
+    # Cada envio é UMA tarefa (1 story, 1 post, 1 TikTok), com quantas fotos forem precisas.
+    self.quantity = 1
     self.month = (month || posted_on || Date.current).to_date.beginning_of_month
   end
 

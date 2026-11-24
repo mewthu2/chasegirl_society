@@ -99,7 +99,7 @@
             <div class="thumbs">
               <% if (img = p.images.first) %><span class="more" style="padding:0"><%= media_thumb(img) %></span><% else %><span class="more"><%= icon("link") %></span><% end %>
             </div>
-            <div class="grow"><b><%= p.influencer.name %></b><div class="muted small"><%= p.quantity %>× <%= p.kind_label %> · <%= date_br(p.posted_on) %></div></div>
+            <div class="grow"><b><%= p.influencer.name %></b><div class="muted small"><%= p.kind_label %> · <%= date_br(p.posted_on) %></div></div>
             <%= icon("chevron-right", class: "muted") %>
           <% end %>
         <% end %>

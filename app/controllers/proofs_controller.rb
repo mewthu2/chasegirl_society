@@ -85,7 +85,7 @@ class ProofsController < ApplicationController
   end
 
   def proof_params
-    params.require(:proof).permit(:kind, :quantity, :posted_on, :month, :link, :description, images: [])
+    params.require(:proof).permit(:kind, :posted_on, :month, :link, :description, images: [])
   end
 
   def after_save_path

@@ -14,7 +14,7 @@
       <span style="margin-left:auto"><%= status_chip(proof.status, proof.status_label) %></span>
     </div>
     <div class="pc-meta">
-      <span><%= icon(channel_icon(proof.kind)) %><%= proof.quantity %>× <%= proof.kind_label %></span>
+      <span><%= icon(channel_icon(proof.kind)) %><%= proof.kind_label %></span>
       <span><%= icon("calendar") %><%= date_br(proof.posted_on) || "—" %></span>
       <span><%= icon("layer-group") %><%= month_label(proof.month, short: true) %></span>
       <% if imgs.size > 3 %><span><%= icon("images") %><%= imgs.size %> arquivos</span><% end %>

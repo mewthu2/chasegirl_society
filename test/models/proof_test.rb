@@ -19,10 +19,12 @@ class ProofTest < ActiveSupport::TestCase
     assert proof.errors[:link].any?
   end
 
-  test "completa https no link e conta 1 story por foto quando a quantidade fica em branco" do
-    proof = @inf.proofs.create!(kind: "stories", quantity: nil, link: "instagram.com/stories/bia", images: [photo, photo, photo])
+  test "várias fotos contam como uma única tarefa" do
+    proof = @inf.proofs.create!(kind: "stories", quantity: 5, link: "instagram.com/stories/bia", images: [photo, photo, photo])
     assert_equal "https://instagram.com/stories/bia", proof.link
-    assert_equal 3, proof.quantity
+    assert_equal 1, proof.quantity
+    assert_equal 3, proof.images.count
+    assert_equal 1, @inf.statement_for(Date.current).tap { proof.approve!(by: users(:admin)) }.delivered_for("stories")
   end
 
   test "não aceita canal não contratado" do

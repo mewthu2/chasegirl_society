@@ -8,7 +8,7 @@
   <div class="card">
     <div class="card-head">
       <h2><%= portal ? "Comprovar combinados" : "O que você está comprovando?" %></h2>
-      <% if portal %><span class="muted small" style="margin-left:auto">Link da publicação + fotos são obrigatórios</span><% end %>
+      <% if portal %><span class="muted small" style="margin-left:auto">Uma tarefa por envio · link + fotos obrigatórios</span><% end %>
     </div>
     <div class="card-body form-grid">
       <% if staff? && proof.new_record? %>
@@ -29,14 +29,13 @@
             <label for="proof_kind_<%= k %>">
               <%= icon(channel_icon(k)) %>
               <b><%= Influencer.channel_label(k) %></b>
-              <small><%= { "feed" => "Post no feed ou Reels", "stories" => "1 foto por tela de story", "tiktok" => "Vídeo publicado no TikTok" }[k] %><%= " · não contratado" unless contracted.include?(k) %></small>
+              <small><%= { "feed" => "Post no feed ou Reels", "stories" => "Um story por envio", "tiktok" => "Vídeo publicado no TikTok" }[k] %><%= " · não contratado" unless contracted.include?(k) %></small>
             </label>
           </div>
         <% end %>
       </div>
-      <div class="field span-6"><%= f.label :link, "Link da publicação *" %><%= f.text_field :link, required: true, inputmode: "url", placeholder: "https://instagram.com/…" %><span class="hint">Copie o link do post, reels, story ou TikTok</span></div>
-      <div class="field span-3"><%= f.label :posted_on, "Data da publicação" %><%= f.date_field :posted_on, max: Date.current %></div>
-      <div class="field span-3"><%= f.label :quantity, "Quantidade" %><%= f.number_field :quantity, min: 1, max: 30, placeholder: "automático" %><span class="hint">Em branco: Stories = nº de fotos</span></div>
+      <div class="field span-8"><%= f.label :link, "Link da publicação *" %><%= f.text_field :link, required: true, inputmode: "url", placeholder: "https://instagram.com/…" %><span class="hint">Copie o link do post, reels, story ou TikTok</span></div>
+      <div class="field span-4"><%= f.label :posted_on, "Data da publicação" %><%= f.date_field :posted_on, max: Date.current %></div>
 
       <div class="span-12">
         <% if proof.persisted? && proof.images.attached? %>
@@ -45,7 +44,7 @@
         <div class="dropzone" data-upload-target="zone" data-action="dragover->upload#over dragleave->upload#leave drop->upload#leave">
           <div class="dz-icon"><%= icon("camera") %></div>
           <b>Toque para adicionar as fotos *</b>
-          <small>Prints dos stories com a marcação @chasebrasil visível, fotos do post ou do TikTok · até <%= Proof::MAX_IMAGES %> por envio</small>
+          <small>Quantas fotos precisar para comprovar esta tarefa (prints, fotos do post, telas do vídeo) · até <%= Proof::MAX_IMAGES %></small>
           <%= f.file_field :images, multiple: true, accept: "image/*,video/*", required: proof.new_record?, data: { upload_target: "input", action: "change->upload#changed" } %>
         </div>
         <div class="previews" data-upload-target="previews"></div>

@@ -22,10 +22,12 @@ class MonthlyStatementTest < ActiveSupport::TestCase
     [fake, calls]
   end
 
-  def proof(kind, qty = 1)
-    @inf.proofs.create!(kind:, quantity: qty, posted_on: @month + 3, link: "https://instagram.com/p/x",
+  def proof(kind)
+    @inf.proofs.create!(kind:, posted_on: @month + 3, link: "https://instagram.com/p/x",
                         images: [fixture_file_upload("story.png", "image/png")])
   end
+
+  def proofs(kind, n) = Array.new(n) { proof(kind) }
 
   test "calendário: conferência de 1 a 10 do mês seguinte, pagamento dia 10" do
     assert_equal Date.new(2026, 11, 1), MonthlyStatement.review_start(@month)
@@ -45,7 +47,7 @@ class MonthlyStatementTest < ActiveSupport::TestCase
     fake, calls = fake_coupon
     with_fake_coupon(fake) do
       proof("feed").approve!(by: @admin)
-      proof("stories", 2).approve!(by: @admin)
+      proofs("stories", 2).each { _1.approve!(by: @admin) }
     end
     st = @inf.statement_for(@month)
     assert st.goal_met?
@@ -55,7 +57,7 @@ class MonthlyStatementTest < ActiveSupport::TestCase
 
   test "aprovar o mês renova o cupom uma vez e cria o a pagar com vencimento dia 10" do
     proof("feed").approve!(by: @admin)
-    proof("stories", 2).approve!(by: @admin)
+    proofs("stories", 2).each { _1.approve!(by: @admin) }
     st = @inf.statement_for(@month)
     fake, calls = fake_coupon(limit: 4)
     with_fake_coupon(fake) do

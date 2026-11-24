@@ -5,7 +5,7 @@
 <div class="page-head">
   <div>
     <div class="eyebrow"><%= month_label(p.month) %></div>
-    <h1><%= p.quantity %>× <%= p.kind_label %> <%= status_chip(p.status, p.status_label) %></h1>
+    <h1><%= p.kind_label %> <%= status_chip(p.status, p.status_label) %></h1>
     <p class="lead"><%= p.influencer.name %> · publicado em <%= date_br(p.posted_on) || "—" %> · enviado em <%= datetime_br(p.created_at) %><%= " por #{p.submitted_by.display_name}" if p.submitted_by %></p>
   </div>
   <div class="actions">
@@ -37,7 +37,6 @@
         <dl class="dl">
           <dt>Influenciadora</dt><dd><%= staff? ? link_to(p.influencer.name, influencer_path(p.influencer)) : p.influencer.name %></dd>
           <dt>Canal</dt><dd><%= icon(channel_icon(p.kind)) %> <%= p.kind_label %></dd>
-          <dt>Quantidade</dt><dd><%= p.quantity %></dd>
           <dt>Competência</dt><dd><%= month_label(p.month) %></dd>
           <dt>Link</dt><dd><%= p.link.present? ? link_to(p.link, p.link, target: "_blank", rel: "noopener") : "—" %></dd>
           <% if p.description.present? %><dt>Observação</dt><dd><%= p.description %></dd><% end %>
