@@ -5,7 +5,7 @@
       <div>
         <div class="eyebrow"><%= @user.staff? ? "Equipe Chase · #{@user.role_label}" : "Pré-cadastro" %></div>
         <h2>Oi<%= ", #{@user.display_name.split.first}" if @user.name.present? || @influencer %>!</h2>
-        <p class="muted">Crie sua senha e confira seus dados para acessar a Chasegirl Society.</p>
+        <p class="muted">Crie sua senha e confira seus dados para acessar a Chase Society.</p>
       </div>
       <%= form_with url: invitation_path(params[:token]), method: :patch, class: "form", data: { turbo: false } do |f| %>
         <div class="field"><label>E-mail de login</label><input type="email" value="<%= @user.email_address %>" disabled></div>

@@ -2,7 +2,7 @@
 # Sem AWS_SES_ACCESS_KEY_ID o Rails usa o padrão do ambiente (em dev/test nada sai de fato).
 if Rails.env.production?
   ActiveSupport.on_load(:action_mailer) do
-    self.default_url_options = { host: ENV.fetch("APP_HOST", "chasegirl-society.herokuapp.com"), protocol: "https" }
+    self.default_url_options = { host: ENV.fetch("APP_HOST", "society.chasebrasil.com"), protocol: "https" }
 
     if ENV["AWS_SES_ACCESS_KEY_ID"].present?
       self.delivery_method = :ses_v2

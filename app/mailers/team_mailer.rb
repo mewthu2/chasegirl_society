@@ -4,6 +4,6 @@ class TeamMailer < ApplicationMailer
     @user = user
     @url = invitation_url(user.generate_token_for(:invitation))
     @expires_on = User::INVITATION_TTL.from_now.to_date
-    mail to: user.email_address, subject: "Seu acesso de #{user.role_label} na Chasegirl Society"
+    mail to: user.email_address, subject: "Seu acesso de #{user.role_label} na Chase Society"
   end
 end

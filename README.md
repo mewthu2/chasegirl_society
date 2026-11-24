@@ -1,4 +1,4 @@
-# Chasegirl Society
+# Chase Society
 
 Painel das parceiras Chase Brasil: influenciadoras enviam a prova dos stories, posts e TikToks; a equipe aprova;
 o sistema calcula o cachê do mês e libera +1 uso no cupom da Shopify quando a meta é batida.

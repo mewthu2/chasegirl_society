@@ -1,8 +1,8 @@
-<% content_for :preheader, "Crie sua senha para acessar o painel da Chasegirl Society." %>
+<% content_for :preheader, "Crie sua senha para acessar o painel da Chase Society." %>
 <% content_for :badge, "Equipe Chase" %>
 <% content_for :hero_title, "Oi#{", #{@user.name.split.first}" if @user.name.present?}! Seu acesso está pronto." %>
 
-<p style="margin:0 0 14px;">Você foi cadastrado(a) como <strong><%= @user.role_label %></strong> na <strong>Chasegirl Society</strong>, o painel das parceiras da Chase: influenciadoras, comprovações, conferência mensal e financeiro.</p>
+<p style="margin:0 0 14px;">Você foi cadastrado(a) como <strong><%= @user.role_label %></strong> na <strong>Chase Society</strong>, o painel das parceiras da Chase: influenciadoras, comprovações, conferência mensal e financeiro.</p>
 <% if @user.manager? %>
   <p style="margin:0 0 14px;">Como Gerente, você configura as metas e os valores de cada influenciadora, confere as entregas e acompanha o A pagar.</p>
 <% end %>
@@ -18,4 +18,4 @@
 
 <p style="margin:16px 0 0;color:#6a6a6a;font-size:13px;">O link vale até <%= l(@expires_on, format: "%d/%m/%Y") %> e só pode ser usado uma vez.</p>
 
-<% content_for :why, "Um administrador da Chase cadastrou este e-mail na equipe da Chasegirl Society." %>
+<% content_for :why, "Um administrador da Chase cadastrou este e-mail na equipe da Chase Society." %>

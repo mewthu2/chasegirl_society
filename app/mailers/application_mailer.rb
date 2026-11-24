@@ -1,5 +1,5 @@
 class ApplicationMailer < ActionMailer::Base
-  default from: ENV.fetch("MAILER_FROM", "Chasegirl Society <naoresponda@chasebrasil.com>")
+  default from: ENV.fetch("MAILER_FROM", "Chase Society <naoresponda@chasebrasil.com>")
   layout "mailer"
   before_action :attach_logo
 

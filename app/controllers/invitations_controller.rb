@@ -15,7 +15,7 @@ class InvitationsController < ApplicationController
     if (@influencer.nil? || @influencer.valid?) && @user.activate!(password: pw[:password], password_confirmation: pw[:password_confirmation])
       @influencer&.save!
       start_new_session_for @user
-      redirect_to (@user.staff? ? root_path : portal_path), notice: "Cadastro concluído! Bem-vind#{@user.staff? ? 'o(a)' : 'a'} à Chasegirl Society."
+      redirect_to (@user.staff? ? root_path : portal_path), notice: "Cadastro concluído! Bem-vind#{@user.staff? ? 'o(a)' : 'a'} à Chase Society."
     else
       flash.now[:alert] = (@user.errors.full_messages + @influencer&.errors&.full_messages.to_a).to_sentence
       render :show, status: :unprocessable_entity

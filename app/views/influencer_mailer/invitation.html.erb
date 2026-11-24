@@ -2,7 +2,7 @@
 <% content_for :badge, "Convite" %>
 <% content_for :hero_title, "Oi, #{@influencer&.name.to_s.split.first.presence || 'tudo bem'}! Você foi convidada." %>
 
-<p style="margin:0 0 14px;">A equipe Chase criou o seu acesso à <strong>Chasegirl Society</strong>, o painel das parceiras da marca. É por lá que você envia as fotos e os links dos seus stories, posts e TikToks, acompanha as metas do mês, o pagamento e o seu cupom.</p>
+<p style="margin:0 0 14px;">A equipe Chase criou o seu acesso à <strong>Chase Society</strong>, o painel das parceiras da marca. É por lá que você envia as fotos e os links dos seus stories, posts e TikToks, acompanha as metas do mês, o pagamento e o seu cupom.</p>
 <p style="margin:0 0 4px;">Para começar, crie a sua senha e confira os seus dados:</p>
 
 <%= render "shared/mail_button", url: @url, label: "Criar minha senha" %>
@@ -24,4 +24,4 @@
 
 <p style="margin:16px 0 0;color:#6a6a6a;font-size:13px;">O link vale até <%= l(@expires_on, format: "%d/%m/%Y") %> e só pode ser usado uma vez. Se expirar, peça um novo para a equipe Chase.</p>
 
-<% content_for :why, "A equipe Chase cadastrou este e-mail como seu acesso à Chasegirl Society. Se você não esperava este convite, pode ignorar." %>
+<% content_for :why, "A equipe Chase cadastrou este e-mail como seu acesso à Chase Society. Se você não esperava este convite, pode ignorar." %>

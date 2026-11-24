@@ -10,7 +10,7 @@
   <div class="hero-row">
     <div class="ring" style="--p: <%= s.progress_percent %>"><span><%= s.progress_percent %>%</span></div>
     <div>
-      <div class="eyebrow">Chasegirl Society · <%= month_label(selected_month) %></div>
+      <div class="eyebrow">Chase Society · <%= month_label(selected_month) %></div>
       <h1>Oi, <%= i.name.split.first %>!</h1>
       <p><%= if s.approved? then "Mês aprovado! Obrigada 🖤" elsif s.goal_met? then "Meta do mês completa. Agora é com a equipe Chase na conferência." else "Envie as provas das suas publicações para completar a meta do mês." end %></p>
     </div>

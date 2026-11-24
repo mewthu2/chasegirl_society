@@ -1,4 +1,4 @@
-/* Chasegirl Society — layout inspirado no painel Honey.Chase, em tons de cinza. */
+/* Chase Society — layout inspirado no painel Honey.Chase, em tons de cinza. */
 @property --angle { syntax: '<angle>'; inherits: false; initial-value: 0deg; }
 
 :root {
@@ -82,6 +82,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
   background: var(--bg-sidebar); border-right: 1px solid var(--border); z-index: 40;
 }
 .sb-header { height: var(--topbar-h); display: flex; align-items: center; padding: 0 18px; border-bottom: 1px solid var(--border); }
+/* Desktop: logo grande e centralizado no topo da barra lateral. */
+@media (min-width: 901px) {
+  .sidebar .sb-header { height: auto; min-height: var(--topbar-h); justify-content: center; padding: 26px 18px 22px; }
+  .sidebar .sb-brand { justify-content: center; }
+  .sidebar .brand-logo { height: auto; width: 168px; }
+}
 .sb-brand { display: flex; align-items: center; gap: 11px; color: var(--text); }
 .brand-mark {
   width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 18px;
