@@ -17,7 +17,7 @@ o sistema calcula o cachê do mês e libera +1 uso no cupom da Shopify quando a 
 | `SECRET_KEY_BASE` | sessões |
 | `SHOPIFY_ACCESS_TOKEN` | token Admin API com `read_discounts` e `write_discounts` |
 | `SHOPIFY_SHOP` | padrão `chasebrasil.myshopify.com` |
-| `AWS_BUCKET`, `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`, `AWS_REGION` | opcional: guarda os prints no S3. Sem isso ficam no Postgres. |
+| `BUCKETEER_*` | criadas pelo add-on Bucketeer: os prints ficam nesse bucket S3 (sem ele, caem no Postgres) |
 
 ## Comandos
 ```
