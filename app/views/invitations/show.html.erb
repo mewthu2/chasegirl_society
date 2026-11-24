@@ -3,8 +3,8 @@
   <section class="login-form-side">
     <div class="login-card" style="max-width:440px">
       <div>
-        <div class="eyebrow">Pré-cadastro</div>
-        <h2>Oi, <%= @influencer&.name.to_s.split.first %>!</h2>
+        <div class="eyebrow"><%= @user.staff? ? "Equipe Chase · #{@user.role_label}" : "Pré-cadastro" %></div>
+        <h2>Oi<%= ", #{@user.display_name.split.first}" if @user.name.present? || @influencer %>!</h2>
         <p class="muted">Crie sua senha e confira seus dados para acessar a Chasegirl Society.</p>
       </div>
       <%= form_with url: invitation_path(params[:token]), method: :patch, class: "form", data: { turbo: false } do |f| %>

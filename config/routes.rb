@@ -48,7 +48,9 @@ Rails.application.routes.draw do
     get "pagos", to: "statements#paid", as: :paid_statements
   end
 
-  resources :users, path: "usuarios", except: :show
+  resources :users, path: "usuarios", except: :show do
+    post :invite, on: :member
+  end
 
   mount ActiveStorageDB::Engine => "/active_storage_db"
   get "up" => "rails/health#show", as: :rails_health_check

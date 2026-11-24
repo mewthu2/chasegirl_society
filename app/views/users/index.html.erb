@@ -6,15 +6,16 @@
 <div class="card">
   <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>Nome</th><th>Perfil</th><th>E-mail</th><th>Desde</th><th></th></tr></thead>
+      <thead><tr><th>Nome</th><th>Perfil</th><th>E-mail</th><th>Acesso</th><th></th></tr></thead>
       <tbody>
         <% @users.each do |u| %>
           <tr>
             <td><span class="person"><%= avatar(u.initials) %><b><%= u.display_name %></b></span></td>
             <td><span class="chip <%= u.admin? ? 'chip-approved' : 'chip-open' %>"><%= u.role_label %></span></td>
             <td class="mono small"><%= u.email_address %></td>
-            <td class="muted"><%= date_br(u.created_at) %></td>
+            <td><%= u.activated? ? tag.span("Ativo", class: "muted") : status_chip("pending", u.invited_at ? "Convite enviado #{date_br(u.invited_at)}" : "Convite não enviado") %></td>
             <td><div class="row-actions">
+              <% unless u == current_user %><%= button_to (u.activated? ? "Enviar link de senha" : (u.invited_at ? "Reenviar convite" : "Enviar convite")), invite_user_path(u), class: "btn btn-secondary btn-sm" %><% end %>
               <%= link_to "Editar", edit_user_path(u), class: "btn btn-ghost btn-sm" %>
               <% unless u == current_user %><%= button_to "Remover", user_path(u), method: :delete, class: "btn btn-ghost btn-sm", form: { data: { turbo_confirm: "Remover #{u.display_name}?" } } %><% end %>
             </div></td>
