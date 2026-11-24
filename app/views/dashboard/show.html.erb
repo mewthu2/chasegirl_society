@@ -1,0 +1,102 @@
+<% content_for :title, "Painel" %>
+
+<div class="page-head">
+  <div>
+    <div class="eyebrow">Chasegirl Society</div>
+    <h1>Painel de <%= month_label(selected_month) %></h1>
+    <p class="lead"><%= @influencers.size %> parcerias ativas no mês · entregas comprovadas, metas e cachês.</p>
+  </div>
+  <div class="actions">
+    <%= month_switcher(:root_path) %>
+    <%= link_to new_influencer_path, class: "btn btn-primary" do %><%= icon("plus") %>Nova influenciadora<% end %>
+  </div>
+</div>
+
+<div class="grid grid-4 stagger">
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("hourglass-half") %>Para conferir</div>
+    <div class="kpi-value"><%= @pending_count %></div>
+    <div class="kpi-sub">comprovações aguardando análise</div>
+  </div>
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("trophy") %>Metas batidas</div>
+    <div class="kpi-value"><%= @goal_met %> <span class="muted" style="font-size:16px">/ <%= @statements.size %></span></div>
+    <%= progress_bar(@goal_met, @statements.size) %>
+  </div>
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("wallet") %>Cachê liberado</div>
+    <div class="kpi-value"><%= brl(@amount_due) %></div>
+    <div class="kpi-sub">de <%= brl(@contracted) %> contratados</div>
+    <%= progress_bar(@amount_due, @contracted) %>
+  </div>
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("check-double") %>Já pago</div>
+    <div class="kpi-value"><%= brl(@amount_paid) %></div>
+    <div class="kpi-sub"><%= brl([@amount_due - @amount_paid, 0].max) %> pendente</div>
+  </div>
+</div>
+
+<div class="grid grid-main" style="margin-top:18px">
+  <div class="card">
+    <div class="card-head">
+      <h2>Acompanhamento individual</h2>
+      <div class="actions"><%= link_to "Ver financeiro", statements_path(mes: month_param(selected_month)), class: "btn btn-ghost btn-sm" %></div>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Influenciadora</th><% Influencer::CHANNELS.each do |k| %><th><%= Influencer.channel_label(k) %></th><% end %><th class="right">A pagar</th><th>Meta</th></tr></thead>
+        <tbody>
+          <% @statements.sort_by { -_1.progress_percent }.each do |s| %>
+            <% i = s.influencer %>
+            <tr>
+              <td><%= link_to influencer_path(i, mes: month_param(selected_month)), class: "person" do %><%= avatar(i.initials) %><span><b><%= i.name %></b><small>@<%= i.instagram %></small></span><% end %></td>
+              <% Influencer::CHANNELS.each do |k| %>
+                <td>
+                  <% if i.goal_for(k).positive? %>
+                    <div class="mini-progress"><span class="n"><%= s.delivered_for(k) %>/<%= i.goal_for(k) %></span><%= progress_bar(s.delivered_for(k), i.goal_for(k)) %></div>
+                  <% else %><span class="muted">—</span><% end %>
+                </td>
+              <% end %>
+              <td class="right nowrap"><%= brl(s.amount_due) %></td>
+              <td><%= s.goal_met? ? status_chip("met", "Batida") : tag.span("#{s.progress_percent}%", class: "muted") %></td>
+            </tr>
+          <% end %>
+          <% if @statements.empty? %><tr><td colspan="6"><div class="empty"><i class="fa-solid fa-users"></i><b>Nenhuma parceria ativa neste mês</b></div></td></tr><% end %>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-head"><h2>Entregas do mês</h2></div>
+      <div class="card-body" style="display:grid;gap:16px">
+        <% @channel_totals.each do |kind, t| %>
+          <div>
+            <div style="display:flex;justify-content:space-between;font-size:13px"><span><%= icon(channel_icon(kind)) %> <%= Influencer.channel_label(kind) %></span><b><%= t[:done] %> / <%= t[:goal] %></b></div>
+            <div style="margin-top:8px"><%= progress_bar(t[:done], t[:goal]) %></div>
+          </div>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <h2>Últimas para conferir</h2>
+        <div class="actions"><%= link_to "Ver todas", proofs_path, class: "btn btn-ghost btn-sm" %></div>
+      </div>
+      <div class="list">
+        <% @pending_proofs.each do |p| %>
+          <%= link_to proof_path(p), class: "list-item" do %>
+            <div class="thumbs">
+              <% if (img = p.images.first) %><span class="more" style="padding:0"><%= media_thumb(img) %></span><% else %><span class="more"><%= icon("link") %></span><% end %>
+            </div>
+            <div class="grow"><b><%= p.influencer.name %></b><div class="muted small"><%= p.quantity %>× <%= p.kind_label %> · <%= date_br(p.posted_on) %></div></div>
+            <%= icon("chevron-right", class: "muted") %>
+          <% end %>
+        <% end %>
+        <% if @pending_proofs.empty? %><div class="empty"><i class="fa-solid fa-check"></i><b>Tudo conferido</b>Nenhuma comprovação pendente.</div><% end %>
+      </div>
+    </div>
+  </div>
+</div>

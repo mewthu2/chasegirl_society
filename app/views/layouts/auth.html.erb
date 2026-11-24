@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title>Entrar · Chasegirl Society</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#050505">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= render "layouts/partials/head" %>
+  </head>
+  <body class="auth">
+    <%= yield %>
+    <%= render "layouts/partials/flash" %>
+  </body>
+</html>

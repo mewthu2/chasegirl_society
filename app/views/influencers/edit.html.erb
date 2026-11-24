@@ -1,0 +1,4 @@
+<% content_for :title, "Editar" %>
+<% content_for :crumb_parent, link_to(@influencer.name, influencer_path(@influencer)) %>
+<div class="page-head"><div><div class="eyebrow">Marketing</div><h1>Editar <%= @influencer.name %></h1></div></div>
+<%= render "form", influencer: @influencer %>

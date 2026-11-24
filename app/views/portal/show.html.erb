@@ -1,0 +1,65 @@
+<% content_for :title, admin? ? "Área de #{@influencer.name}" : "Minha área" %>
+<% s = @statement; i = @influencer %>
+<% extra = admin? ? { influencer_id: i.id } : {} %>
+
+<% if admin? %>
+  <div class="callout" style="margin-bottom:16px"><%= icon("eye") %><span>Você está vendo a área como <b><%= i.name %></b> enxerga. <%= link_to "Voltar para a ficha", influencer_path(i) %></span></div>
+<% end %>
+
+<div class="hero">
+  <div class="hero-row">
+    <div class="ring" style="--p: <%= s.progress_percent %>"><span><%= s.progress_percent %>%</span></div>
+    <div>
+      <div class="eyebrow">Chasegirl Society · <%= month_label(selected_month) %></div>
+      <h1>Oi, <%= i.name.split.first %>!</h1>
+      <p><%= s.goal_met? ? "Meta do mês batida. Obrigada! 🖤" : "Envie as provas das suas publicações para completar a meta do mês." %></p>
+    </div>
+    <div class="actions">
+      <%= month_switcher(:portal_path, **extra) %>
+      <% unless admin? %><%= link_to new_proof_path, class: "btn btn-primary btn-lg" do %><%= icon("cloud-arrow-up") %>Enviar comprovação<% end %><% end %>
+    </div>
+  </div>
+</div>
+
+<%= render "shared/channels", statement: s %>
+
+<div class="grid grid-3" style="margin-top:16px">
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("wallet") %>Cachê liberado no mês</div>
+    <div class="kpi-value"><%= brl(s.amount_due) %></div>
+    <div class="kpi-sub">de <%= brl(s.amount_contracted) %> · cada canal cumprido libera a sua parte</div>
+  </div>
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("receipt") %>Pagamento</div>
+    <div style="margin-top:12px"><%= status_chip(s.payment_status, s.payment_label) %></div>
+    <div class="kpi-sub"><%= s.paid? ? "#{brl(s.amount_paid)} pago em #{date_br(s.paid_at)}" : "Pagamento via PIX após o fechamento do mês" %></div>
+  </div>
+  <div class="card kpi">
+    <div class="kpi-label"><%= icon("ticket") %>Seu cupom</div>
+    <div class="code mono" style="font-size:19px;margin-top:8px;letter-spacing:.06em"><%= i.coupon_code || "—" %></div>
+    <div class="kpi-sub"><%= if s.coupon_done? then "Liberado mais 1 uso neste mês (permuta #{brl(i.permuta_value)})" elsif s.goal_met? then "Meta batida! A equipe Chase está liberando o seu cupom." else "Bata a meta do mês para liberar +1 uso" end %></div>
+  </div>
+</div>
+
+<div class="card" style="margin-top:18px">
+  <div class="card-head"><h2>Envios de <%= month_label(selected_month) %></h2></div>
+  <% if @proofs.any? %>
+    <div class="card-body"><div class="proof-cards"><%= render partial: "proofs/card", collection: @proofs, as: :proof %></div></div>
+  <% else %>
+    <div class="empty"><i class="fa-regular fa-images"></i><b>Nenhum envio neste mês</b>Toque em "Enviar comprovação" para mandar seus prints.</div>
+  <% end %>
+</div>
+
+<% if @history.any? %>
+  <div class="card">
+    <div class="card-head"><h2>Meses anteriores</h2></div>
+    <div class="list">
+      <% @history.each do |h| %>
+        <%= link_to portal_path(extra.merge(mes: month_param(h.month))), class: "list-item" do %>
+          <div class="grow"><b><%= month_label(h.month) %></b><div class="muted small"><%= h.progress_percent %>% das metas · <%= brl(h.amount_due) %></div></div>
+          <%= status_chip(h.payment_status, h.payment_label) %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+<% end %>

@@ -1,0 +1,4 @@
+<% content_for :title, "Editar comprovação" %>
+<% content_for :crumb_parent, link_to("Comprovação", proof_path(@proof)) %>
+<div class="page-head"><div><div class="eyebrow">Comprovação</div><h1>Editar comprovação</h1><p class="lead">Novos arquivos são somados aos já enviados.</p></div></div>
+<%= render "form", proof: @proof %>

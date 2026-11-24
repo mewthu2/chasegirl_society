@@ -1,0 +1,41 @@
+<div class="login">
+  <section class="login-brand">
+    <div class="aurora"><span></span><span></span><span></span></div>
+    <div class="grid-lines"></div>
+    <div class="sb-brand">
+      <span class="brand-mark">C</span>
+      <span class="brand-txt"><b>CHASEGIRL</b><small>society</small></span>
+    </div>
+    <div>
+      <div class="big">Chasegirl<br><em>Society.</em></div>
+      <p class="tagline">O espaço das parceiras Chase: envie as provas dos seus stories, posts e TikToks, acompanhe as metas do mês e o seu pagamento.</p>
+    </div>
+    <div class="login-features">
+      <div><i class="fa-solid fa-cloud-arrow-up"></i>Envie os prints direto do celular</div>
+      <div><i class="fa-solid fa-chart-simple"></i>Acompanhe Feed, Stories e TikTok do mês</div>
+      <div><i class="fa-solid fa-ticket"></i>Meta batida libera o seu cupom</div>
+    </div>
+  </section>
+
+  <section class="login-form-side">
+    <div class="login-card">
+      <div>
+        <div class="eyebrow">Acesso</div>
+        <h2>Entrar</h2>
+        <p class="muted">Use o e-mail e a senha que a equipe Chase enviou para você.</p>
+      </div>
+      <%= form_with url: session_path, class: "form", data: { turbo: false } do |form| %>
+        <div class="field">
+          <%= form.label :email_address, "E-mail" %>
+          <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "voce@email.com", value: params[:email_address] %>
+        </div>
+        <div class="field">
+          <%= form.label :password, "Senha" %>
+          <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "••••••••", maxlength: 72 %>
+        </div>
+        <%= form.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
+      <% end %>
+      <p class="muted small">Esqueceu a senha? Fale com a equipe Chase para redefinir.</p>
+    </div>
+  </section>
+</div>

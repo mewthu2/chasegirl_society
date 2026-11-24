@@ -1,0 +1,50 @@
+<% content_for :title, "Influenciadoras" %>
+
+<div class="page-head">
+  <div>
+    <div class="eyebrow">Marketing</div>
+    <h1>Influenciadoras</h1>
+    <p class="lead">Cadastro, metas por canal, cachê e acesso de cada parceira.</p>
+  </div>
+  <div class="actions">
+    <%= link_to new_influencer_path, class: "btn btn-primary" do %><%= icon("plus") %>Nova influenciadora<% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="toolbar">
+    <%= form_with url: influencers_path, method: :get, style: "display:flex;gap:8px;flex:1;min-width:220px" do |f| %>
+      <%= f.hidden_field :status, value: params[:status] %>
+      <%= f.search_field :q, value: params[:q], placeholder: "Buscar por nome, @, cupom…", class: "input", style: "max-width:340px" %>
+      <%= f.button icon("magnifying-glass"), class: "btn btn-secondary" %>
+    <% end %>
+    <div class="seg">
+      <% { "ativas" => "Ativas", "inativas" => "Inativas", "todas" => "Todas" }.each do |key, label| %>
+        <%= link_to label, influencers_path(status: key, q: params[:q]), class: ("is-active" if (params[:status].presence || "ativas") == key) %>
+      <% end %>
+    </div>
+  </div>
+  <div class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr><th>Influenciadora</th><th>Cupom</th><th>Metas (F · S · T)</th><th class="right">Cachê</th><th class="right">Permuta</th><th>Vigência</th><th><%= month_label(selected_month, short: true) %></th><th>Acesso</th></tr>
+      </thead>
+      <tbody>
+        <% @influencers.each do |i| %>
+          <% st = @statements[i.id] %>
+          <tr class="<%= 'dim' unless i.active? %>">
+            <td><%= link_to influencer_path(i), class: "person" do %><%= avatar(i.initials) %><span><b><%= i.name %></b><small>@<%= i.instagram %><%= " · #{i.city}" if i.city.present? %> · <%= compact_number(i.followers) %></small></span><% end %></td>
+            <td><span class="mono small"><%= i.coupon_code || "—" %></span></td>
+            <td class="nowrap"><%= i.feed_goal %> · <%= i.stories_goal %> · <%= i.tiktok_goal.positive? ? i.tiktok_goal : tag.span("—", class: "muted") %></td>
+            <td class="right nowrap"><%= i.cash_is_permuta? ? tag.span("Só permuta", class: "muted") : brl(i.cash_value) %></td>
+            <td class="right nowrap"><%= brl(i.permuta_value) %></td>
+            <td class="nowrap small muted"><%= date_br(i.starts_on) %> → <%= date_br(i.ends_on) %></td>
+            <td><%= st ? (st.goal_met? ? status_chip("met", "Meta") : "#{st.progress_percent}%") : tag.span("—", class: "muted") %></td>
+            <td><%= i.user ? tag.span(icon("key"), class: "tag", title: i.user.email_address) : tag.span("sem acesso", class: "muted small") %></td>
+          </tr>
+        <% end %>
+        <% if @influencers.empty? %><tr><td colspan="8"><div class="empty"><i class="fa-solid fa-user-plus"></i><b>Nenhuma influenciadora encontrada</b></div></td></tr><% end %>
+      </tbody>
+    </table>
+  </div>
+</div>

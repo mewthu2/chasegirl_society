@@ -1,0 +1,12 @@
+<div class="toasts" aria-live="polite">
+  <% { notice: "circle-check", alert: "circle-exclamation" }.each do |type, ic| %>
+    <% if flash[type].present? %>
+      <div class="toast toast-<%= type %>" data-controller="toast">
+        <%= icon(ic) %>
+        <span><%= flash[type] %></span>
+        <button type="button" class="icon-btn" data-action="toast#close" aria-label="Fechar"><%= icon("xmark") %></button>
+        <span class="toast-bar"></span>
+      </div>
+    <% end %>
+  <% end %>
+</div>

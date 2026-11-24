@@ -1,0 +1,52 @@
+<% s = @statement; i = s.influencer %>
+<% content_for :title, "#{i.name} · #{month_label(s.month)}" %>
+<% content_for :crumb_parent, link_to("A pagar", statements_path(mes: month_param(s.month))) %>
+
+<div class="page-head">
+  <div>
+    <div class="eyebrow">Fechamento · <%= month_label(s.month) %></div>
+    <h1><%= i.name %></h1>
+    <p class="lead">Chave PIX: <span class="mono"><%= i.pix_key.presence || "a informar" %></span> · cupom <span class="mono"><%= i.coupon_code || "—" %></span></p>
+  </div>
+  <div class="actions"><%= link_to "Ficha da influenciadora", influencer_path(i, mes: month_param(s.month)), class: "btn btn-secondary" %></div>
+</div>
+
+<%= render "shared/channels", statement: s %>
+
+<div class="grid grid-3" style="margin-top:16px">
+  <div class="card kpi"><div class="kpi-label">A pagar</div><div class="kpi-value"><%= brl(s.amount_due) %></div><div class="kpi-sub">de <%= brl(s.amount_contracted) %> contratados</div></div>
+  <div class="card kpi">
+    <div class="kpi-label">Pagamento</div>
+    <div style="margin-top:10px"><%= status_chip(s.payment_status, s.payment_label) %></div>
+    <div class="kpi-sub"><%= s.paid? ? "#{brl(s.amount_paid)} em #{datetime_br(s.paid_at)} por #{s.paid_by&.display_name}" : "" %></div>
+    <div style="margin-top:12px">
+      <% if s.paid? %>
+        <%= button_to "Desfazer pagamento", unpay_statement_path(s), class: "btn btn-ghost btn-sm" %>
+      <% else %>
+        <%= form_with url: pay_statement_path(s), class: "form" do |f| %>
+          <div class="field"><%= f.text_field :amount, value: number_with_precision(s.amount_due, precision: 2, separator: ",", delimiter: "."), inputmode: "decimal" %></div>
+          <div class="field"><%= f.text_field :note, placeholder: "Observação (opcional)" %></div>
+          <%= f.button class: "btn btn-primary btn-sm" do %><%= icon("check") %>Marcar pago<% end %>
+        <% end %>
+      <% end %>
+    </div>
+  </div>
+  <div class="card kpi">
+    <div class="kpi-label">Cupom</div>
+    <div style="margin-top:10px"><%= status_chip(s.coupon_status, s.coupon_label) %></div>
+    <div class="kpi-sub">
+      <% if s.coupon_done? %>Novo limite de usos: <b><%= s.coupon_usage_limit %></b> · <%= datetime_br(s.coupon_incremented_at) %><% end %>
+      <%= s.coupon_error %>
+    </div>
+    <% if s.goal_met? && !s.coupon_done? %><div style="margin-top:12px"><%= button_to "Tentar liberar cupom", coupon_statement_path(s), class: "btn btn-secondary btn-sm" %></div><% end %>
+  </div>
+</div>
+
+<div class="card" style="margin-top:18px">
+  <div class="card-head"><h2>Comprovações do mês</h2></div>
+  <% if @proofs.any? %>
+    <div class="card-body"><div class="proof-cards"><%= render partial: "proofs/card", collection: @proofs, as: :proof %></div></div>
+  <% else %>
+    <div class="empty"><i class="fa-regular fa-images"></i><b>Nenhuma comprovação</b></div>
+  <% end %>
+</div>

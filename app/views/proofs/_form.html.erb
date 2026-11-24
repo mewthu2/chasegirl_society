@@ -1,0 +1,55 @@
+<%= form_with model: proof, class: "form", data: { controller: "upload" } do |f| %>
+  <%= render "shared/errors", record: proof %>
+  <%= hidden_field_tag :return_to, params[:return_to] %>
+
+  <div class="card">
+    <div class="card-head"><h2>O que você está comprovando?</h2></div>
+    <div class="card-body form-grid">
+      <% if admin? && proof.new_record? %>
+        <div class="field span-12">
+          <%= f.label :influencer_id, "Influenciadora" %>
+          <%= f.collection_select :influencer_id, Influencer.active.ordered, :id, :name, { prompt: "Escolha…" }, required: true %>
+        </div>
+      <% end %>
+      <% contracted = proof.influencer&.channels || Influencer::CHANNELS %>
+      <div class="span-12 kind-picker">
+        <% Influencer::CHANNELS.each do |k| %>
+          <div class="kind-option">
+            <%= f.radio_button :kind, k, disabled: !contracted.include?(k) %>
+            <label for="proof_kind_<%= k %>">
+              <%= icon(channel_icon(k)) %>
+              <b><%= Influencer.channel_label(k) %></b>
+              <small><%= { "feed" => "Post no feed ou Reels", "stories" => "Uma prova por tela de story", "tiktok" => "Vídeo publicado no TikTok" }[k] %><%= " · não contratado" unless contracted.include?(k) %></small>
+            </label>
+          </div>
+        <% end %>
+      </div>
+      <div class="field span-4"><%= f.label :quantity, "Quantidade" %><%= f.number_field :quantity, min: 1, max: 30 %><span class="hint">Ex.: 3 telas de stories no mesmo envio</span></div>
+      <div class="field span-4"><%= f.label :posted_on, "Data da publicação" %><%= f.date_field :posted_on, max: Date.current %></div>
+      <div class="field span-4"><%= f.label :link, "Link (opcional)" %><%= f.url_field :link, placeholder: "https://instagram.com/p/…" %></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Prints / gravação de tela</h2><span class="uploading" style="margin-left:auto"><span class="spinner"></span>Preparando imagens…</span></div>
+    <div class="card-body">
+      <% if proof.persisted? && proof.images.attached? %>
+        <div class="gallery" style="margin-bottom:14px"><% proof.images.each do |img| %><%= link_to media_thumb(img), url_for(img), target: "_blank" %><% end %></div>
+      <% end %>
+      <div class="dropzone" data-upload-target="zone" data-action="dragover->upload#over dragleave->upload#leave drop->upload#leave">
+        <div class="dz-icon"><%= icon("cloud-arrow-up") %></div>
+        <b>Toque para escolher ou arraste os arquivos</b>
+        <small>Prints dos stories (com a marcação @chasebrasil visível), fotos ou vídeos · até <%= Proof::MAX_IMAGES %> por envio</small>
+        <%= f.file_field :images, multiple: true, accept: "image/*,video/*", data: { upload_target: "input", action: "change->upload#changed" } %>
+      </div>
+      <div class="previews" data-upload-target="previews"></div>
+      <div class="field" style="margin-top:16px"><%= f.label :description, "Observação (opcional)" %><%= f.text_area :description, rows: 2, placeholder: "Algo que a equipe Chase precisa saber?" %></div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <% if admin? && proof.new_record? %><label class="check" style="margin-right:auto"><%= check_box_tag :approve_now, "1", false %> Já aprovar ao salvar</label><% end %>
+    <%= link_to "Cancelar", proof.persisted? ? proof_path(proof) : (admin? ? proofs_path : portal_path), class: "btn btn-ghost" %>
+    <%= f.button class: "btn btn-primary btn-lg", data: { upload_target: "submit", turbo_submits_with: "Enviando…" } do %><%= icon("paper-plane") %><%= proof.persisted? ? "Salvar" : "Enviar comprovação" %><% end %>
+  </div>
+<% end %>

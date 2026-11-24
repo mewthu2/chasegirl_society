@@ -1,0 +1,39 @@
+<aside class="sidebar" aria-label="Menu principal">
+  <div class="sb-header">
+    <%= link_to root_path, class: "sb-brand" do %>
+      <span class="brand-mark">C</span>
+      <span class="brand-txt"><b>CHASEGIRL</b><small>society</small></span>
+    <% end %>
+  </div>
+
+  <nav class="sb-nav">
+    <% if admin? %>
+      <% pending = Proof.pending.count %>
+      <div class="sb-section-title">Visão geral</div>
+      <%= nav_link "Painel", root_path, "chart-simple", desc: "Resumo do mês", active: controller_name == "dashboard" %>
+
+      <div class="sb-section-title">Marketing</div>
+      <%= nav_link "Influenciadoras", influencers_path, "users", desc: "Cadastro, metas e acessos", active: controller_name == "influencers" || controller_name == "portal" %>
+      <%= nav_link "Comprovações", proofs_path, "images", desc: "Prints e links para conferir", active: controller_name == "proofs", badge: pending %>
+
+      <div class="sb-section-title">Financeiro</div>
+      <%= nav_link "A pagar", statements_path, "wallet", desc: "Cachês do mês e cupons", active: controller_name == "statements" %>
+
+      <div class="sb-section-title">Configurações</div>
+      <%= nav_link "Equipe Chase", users_path, "user-shield", desc: "Usuários administradores", active: controller_name == "users" %>
+    <% else %>
+      <div class="sb-section-title">Minha parceria</div>
+      <%= nav_link "Minha área", portal_path, "house", desc: "Metas e pagamentos", active: controller_name == "portal" %>
+      <%= nav_link "Enviar comprovação", new_proof_path, "cloud-arrow-up", desc: "Prints dos stories e posts", active: controller_name == "proofs" && %w[new create].include?(action_name) %>
+      <%= nav_link "Minhas comprovações", proofs_path, "images", desc: "Histórico de envios", active: controller_name == "proofs" && !%w[new create].include?(action_name) %>
+    <% end %>
+  </nav>
+
+  <div class="sb-footer">
+    <%= link_to edit_account_path, class: "sb-user" do %>
+      <%= avatar(current_user.initials) %>
+      <span class="sb-txt"><span class="sb-label"><%= current_user.display_name %></span><span class="sb-desc"><%= current_user.admin? ? "Equipe Chase" : "Influenciadora" %></span></span>
+    <% end %>
+    <%= button_to session_path, method: :delete, class: "icon-btn", title: "Sair", form: { data: { turbo: false } } do %><%= icon("arrow-right-from-bracket") %><% end %>
+  </div>
+</aside>

@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+  <head>
+    <title><%= content_for?(:title) ? "#{yield(:title)} · Chasegirl Society" : "Chasegirl Society" %></title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+    <meta name="color-scheme" content="dark">
+    <meta name="theme-color" content="#0a0a0a">
+    <%= csrf_meta_tags %>
+    <%= csp_meta_tag %>
+    <%= render "layouts/partials/head" %>
+  </head>
+
+  <body class="<%= controller_name %> <%= action_name %>" data-controller="shell">
+    <div class="app">
+      <%= render "layouts/partials/sidebar" %>
+      <div class="sidebar-overlay" data-action="click->shell#close"></div>
+      <div class="main">
+        <%= render "layouts/partials/topbar" %>
+        <main class="content page-enter">
+          <%= yield %>
+        </main>
+        <footer class="footer">
+          <span>Chasegirl Society · <%= Date.current.year %></span>
+          <span class="muted">CHASE BRASIL</span>
+        </footer>
+      </div>
+    </div>
+    <%= render "layouts/partials/flash" %>
+  </body>
+</html>

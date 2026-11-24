@@ -1,0 +1,16 @@
+<%# Metas do mês por canal. locals: statement %>
+<% inf = statement.influencer %>
+<div class="channels">
+  <% inf.channels.each do |kind| %>
+    <% done = statement.delivered_for(kind); goal = inf.goal_for(kind); pend = statement.pending_for(kind) %>
+    <div class="channel <%= 'is-met' if statement.channel_met?(kind) %>">
+      <div class="channel-head"><%= icon(channel_icon(kind)) %><%= Influencer.channel_label(kind) %></div>
+      <div class="channel-count"><%= done %><small> / <%= goal %></small></div>
+      <%= progress_bar(done, goal) %>
+      <div class="channel-foot">
+        <span><%= percent(inf.share_percent(kind)) %> · <b><%= brl(inf.channel_value(kind)) %></b></span>
+        <span><%= pend.positive? ? "#{pend} em análise" : (statement.channel_met?(kind) ? "Cumprido" : "Faltam #{[goal - done, 0].max}") %></span>
+      </div>
+    </div>
+  <% end %>
+</div>

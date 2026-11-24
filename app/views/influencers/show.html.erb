@@ -1,0 +1,122 @@
+<% content_for :title, @influencer.name %>
+<% content_for :crumb_parent, link_to("Influenciadoras", influencers_path) %>
+<% i = @influencer %>
+
+<div class="hero">
+  <div class="hero-row">
+    <%= avatar(i.initials, size: "lg") %>
+    <div>
+      <h1><%= i.name %> <% unless i.active? %><span class="chip chip-none">Inativa</span><% end %></h1>
+      <p>
+        <% if i.instagram %><%= link_to "@#{i.instagram}", i.instagram_url, target: "_blank", rel: "noopener" %><% end %>
+        <% if i.tiktok %> · TikTok <%= link_to "@#{i.tiktok}", i.tiktok_url, target: "_blank", rel: "noopener" %><% end %>
+        <%= " · #{i.city}" if i.city.present? %> · <%= compact_number(i.followers) %> seguidores
+      </p>
+    </div>
+    <div class="actions">
+      <%= link_to portal_path(influencer_id: i.id, mes: month_param(selected_month)), class: "btn btn-secondary" do %><%= icon("eye") %>Ver como ela vê<% end %>
+      <%= link_to new_proof_path(influencer_id: i.id), class: "btn btn-secondary" do %><%= icon("plus") %>Lançar comprovação<% end %>
+      <%= link_to edit_influencer_path(i), class: "btn btn-primary" do %><%= icon("pen") %>Editar<% end %>
+    </div>
+  </div>
+</div>
+
+<div class="grid grid-main">
+  <div>
+    <div class="card">
+      <div class="card-head">
+        <h2>Metas de <%= month_label(selected_month) %></h2>
+        <div class="actions"><%= month_switcher(:influencer_path, id: i.id) %></div>
+      </div>
+      <div class="card-body" style="display:grid;gap:16px">
+        <%= render "shared/channels", statement: @statement %>
+        <div class="grid grid-3">
+          <div><div class="muted small">A pagar no mês</div><div class="kpi-value" style="font-size:22px;margin-top:2px"><%= brl(@statement.amount_due) %></div></div>
+          <div><div class="muted small">Pagamento</div><div style="margin-top:6px"><%= status_chip(@statement.payment_status, @statement.payment_label) %></div></div>
+          <div><div class="muted small">Cupom</div><div style="margin-top:6px"><%= status_chip(@statement.coupon_status, @statement.coupon_label) %></div></div>
+        </div>
+        <% if @statement.coupon_error.present? %><div class="callout"><%= icon("triangle-exclamation") %><span><%= @statement.coupon_error %></span></div><% end %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Comprovações</h2><div class="actions"><%= link_to "Filtrar", proofs_path(influencer_id: i.id, status: "todas"), class: "btn btn-ghost btn-sm" %></div></div>
+      <div class="table-wrap">
+        <table class="table">
+          <thead><tr><th>Prova</th><th>Canal</th><th>Competência</th><th>Postado</th><th>Situação</th></tr></thead>
+          <tbody>
+            <% @proofs.each do |p| %>
+              <tr>
+                <td><%= link_to proof_path(p), class: "thumbs" do %><% p.images.first(3).each do |img| %><span class="more" style="padding:0"><%= media_thumb(img) %></span><% end %><% if p.images.none? %><span class="more"><%= icon("link") %></span><% end %><% end %></td>
+                <td><%= p.quantity %>× <%= p.kind_label %></td>
+                <td><%= month_label(p.month, short: true) %></td>
+                <td><%= date_br(p.posted_on) %></td>
+                <td><%= status_chip(p.status, p.status_label) %></td>
+              </tr>
+            <% end %>
+            <% if @proofs.empty? %><tr><td colspan="5"><div class="empty"><i class="fa-regular fa-images"></i><b>Nenhuma comprovação ainda</b></div></td></tr><% end %>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-head"><h2>Acesso ao sistema</h2></div>
+      <div class="card-body">
+        <%= form_with url: access_influencer_path(i), scope: :access, class: "form", data: { turbo: false } do |f| %>
+          <div class="field"><%= f.label :email_address, "E-mail de login" %><%= f.email_field :email_address, value: i.user&.email_address, required: true %></div>
+          <div class="field"><%= f.label :password, i.user ? "Nova senha (deixe vazio para manter)" : "Senha" %><%= f.text_field :password, required: i.user.nil?, autocomplete: "off", placeholder: "mín. 6 caracteres", value: (i.user ? nil : "chase@#{Date.current.year}") %></div>
+          <div class="form-actions" style="justify-content:space-between">
+            <% if i.user %>
+              <%= link_to "Remover acesso", access_influencer_path(i), class: "btn btn-ghost btn-sm", data: { turbo_method: :delete, turbo_confirm: "Remover o acesso de #{i.name}?" } %>
+            <% else %><span></span><% end %>
+            <%= f.button class: "btn btn-primary btn-sm" do %><%= icon("key") %><%= i.user ? "Atualizar acesso" : "Criar acesso" %><% end %>
+          </div>
+        <% end %>
+        <% if i.user %><p class="muted small" style="margin-top:10px">Ela entra em <b><%= request.host %></b> com <span class="mono"><%= i.user.email_address %></span>.</p><% end %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Contrato</h2></div>
+      <div class="card-body" style="display:grid;gap:16px">
+        <div class="coupon">
+          <span class="ic"><%= icon("ticket") %></span>
+          <div style="flex:1"><div class="muted small">Cupom · permuta de <%= brl(i.permuta_value) %></div><div class="code"><%= i.coupon_code || "—" %></div></div>
+          <% if i.coupon_code %><%= link_to icon("rotate"), coupon_influencer_path(i), class: "icon-btn", title: "Consultar limite de usos na Shopify" %><% end %>
+        </div>
+        <div>
+          <div class="muted small">Divisão do cachê de <%= i.cash_is_permuta? ? "permuta" : brl(i.cash_value) %></div>
+          <div class="split-bar"><% i.channels.each do |k| %><span class="on" style="flex:1" title="<%= Influencer.channel_label(k) %>"></span><% end %></div>
+          <dl class="dl" style="margin-top:12px">
+            <% i.channels.each do |k| %><dt><%= icon(channel_icon(k)) %> <%= Influencer.channel_label(k) %> (<%= i.goal_for(k) %>/mês)</dt><dd><%= percent(i.share_percent(k)) %> · <%= brl(i.channel_value(k)) %></dd><% end %>
+          </dl>
+        </div>
+        <dl class="dl">
+          <dt>Vigência</dt><dd><%= date_br(i.starts_on) || "—" %> → <%= date_br(i.ends_on) || "—" %></dd>
+          <dt>Chave PIX</dt><dd class="mono"><%= i.pix_key.presence || "—" %></dd>
+          <dt>Telefone</dt><dd><%= i.phone.presence || "—" %></dd>
+          <% if i.notes.present? %><dt>Obs.</dt><dd><%= simple_format(i.notes) %></dd><% end %>
+        </dl>
+        <% if i.active? %>
+          <%= button_to "Desativar parceria", influencer_path(i), method: :delete, class: "btn btn-ghost btn-sm", form: { data: { turbo_confirm: "Desativar #{i.name}? O histórico é mantido." } } %>
+        <% end %>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head"><h2>Histórico mensal</h2></div>
+      <div class="list">
+        <% @statements.each do |s| %>
+          <%= link_to statement_path(s), class: "list-item" do %>
+            <div class="grow"><b><%= month_label(s.month) %></b><div class="muted small"><%= s.progress_percent %>% das metas · <%= brl(s.amount_due) %></div></div>
+            <%= status_chip(s.payment_status, s.payment_label) %>
+          <% end %>
+        <% end %>
+        <% if @statements.empty? %><div class="empty">Sem histórico.</div><% end %>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,6 @@
+<% if record.errors.any? %>
+  <div class="errors">
+    <b><i class="fa-solid fa-circle-exclamation"></i> Corrija os pontos abaixo:</b>
+    <ul><% record.errors.full_messages.each do |msg| %><li><%= msg %></li><% end %></ul>
+  </div>
+<% end %>

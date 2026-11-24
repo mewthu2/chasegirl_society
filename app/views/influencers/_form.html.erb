@@ -1,0 +1,38 @@
+<%= form_with model: influencer, class: "form" do |f| %>
+  <%= render "shared/errors", record: influencer %>
+  <div class="card">
+    <div class="card-head"><h2>Dados da parceira</h2></div>
+    <div class="card-body form-grid">
+      <div class="field span-6"><%= f.label :name, "Nome" %><%= f.text_field :name, required: true %></div>
+      <div class="field span-3"><%= f.label :city, "Cidade/Estado" %><%= f.text_field :city %></div>
+      <div class="field span-3"><%= f.label :followers, "Seguidores" %><%= f.number_field :followers, min: 0 %></div>
+      <div class="field span-4"><%= f.label :instagram, "@Instagram" %><%= f.text_field :instagram, placeholder: "usuario" %></div>
+      <div class="field span-4"><%= f.label :tiktok, "@TikTok" %><%= f.text_field :tiktok, placeholder: "deixe vazio se não tiver" %></div>
+      <div class="field span-4"><%= f.label :phone, "Telefone" %><%= f.text_field :phone %></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-head"><h2>Contrato mensal</h2></div>
+    <div class="card-body form-grid">
+      <div class="field span-4"><%= f.label :feed_goal, "Meta Feed/Reels por mês" %><%= f.number_field :feed_goal, min: 0 %></div>
+      <div class="field span-4"><%= f.label :stories_goal, "Meta Stories (telas) por mês" %><%= f.number_field :stories_goal, min: 0 %></div>
+      <div class="field span-4"><%= f.label :tiktok_goal, "Meta TikTok por mês" %><%= f.number_field :tiktok_goal, min: 0 %><span class="hint">0 = não tem TikTok</span></div>
+      <div class="span-12 callout"><%= icon("divide") %><span>O cachê é dividido igualmente entre os canais com meta: com Feed, Stories e TikTok cada um vale 33,33%; sem TikTok, 50% cada. Cada canal cumprido no mês libera a sua parte.</span></div>
+      <div class="field span-4"><%= f.label :cash_value, "Cachê mensal (PIX) R$" %><%= f.number_field :cash_value, step: "0.01", min: 0 %></div>
+      <div class="field span-4"><%= f.label :permuta_value, "Permuta (valor do cupom) R$" %><%= f.number_field :permuta_value, step: "0.01", min: 0 %></div>
+      <div class="field span-4"><%= f.label :coupon_code, "Cupom na Shopify" %><%= f.text_field :coupon_code, class: "mono", placeholder: "CGNOME" %><span class="hint">Meta batida = +1 no limite de usos</span></div>
+      <div class="field span-4" style="justify-content:flex-end"><label class="check"><%= f.check_box :cash_is_permuta %> Só permuta (sem cachê em dinheiro)</label></div>
+      <div class="field span-4"><%= f.label :starts_on, "Início" %><%= f.date_field :starts_on %></div>
+      <div class="field span-4"><%= f.label :ends_on, "Fim" %><%= f.date_field :ends_on %></div>
+      <div class="field span-6"><%= f.label :pix_key, "Chave PIX" %><%= f.text_field :pix_key %></div>
+      <div class="field span-6" style="justify-content:flex-end"><label class="check"><%= f.check_box :active %> Parceria ativa</label></div>
+      <div class="field span-12"><%= f.label :notes, "Observações" %><%= f.text_area :notes, rows: 3 %></div>
+    </div>
+  </div>
+
+  <div class="form-actions">
+    <%= link_to "Cancelar", influencer.persisted? ? influencer_path(influencer) : influencers_path, class: "btn btn-ghost" %>
+    <%= f.button class: "btn btn-primary" do %><%= icon("check") %>Salvar<% end %>
+  </div>
+<% end %>

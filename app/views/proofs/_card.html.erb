@@ -1,0 +1,43 @@
+<% imgs = proof.images.to_a %>
+<article class="card proof-card">
+  <div class="pc-media">
+    <% imgs.first(3).each do |img| %><%= link_to media_thumb(img), url_for(img), target: "_blank", rel: "noopener" %><% end %>
+    <% if imgs.empty? %><div class="no-media"><%= icon("link") %><span class="small">Sem print · ver link</span></div><% end %>
+  </div>
+  <div class="pc-body">
+    <div class="pc-top">
+      <% if admin? %>
+        <%= link_to influencer_path(proof.influencer), class: "person" do %><%= avatar(proof.influencer.initials) %><span><b><%= proof.influencer.name %></b><small>@<%= proof.influencer.instagram %></small></span><% end %>
+      <% else %>
+        <b><%= icon(channel_icon(proof.kind)) %> <%= proof.kind_label %></b>
+      <% end %>
+      <span style="margin-left:auto"><%= status_chip(proof.status, proof.status_label) %></span>
+    </div>
+    <div class="pc-meta">
+      <span><%= icon(channel_icon(proof.kind)) %><%= proof.quantity %>× <%= proof.kind_label %></span>
+      <span><%= icon("calendar") %><%= date_br(proof.posted_on) || "—" %></span>
+      <span><%= icon("layer-group") %><%= month_label(proof.month, short: true) %></span>
+      <% if imgs.size > 3 %><span><%= icon("images") %><%= imgs.size %> arquivos</span><% end %>
+      <% if proof.link.present? %><span><%= link_to proof.link, target: "_blank", rel: "noopener" do %><%= icon("arrow-up-right-from-square") %>Abrir link<% end %></span><% end %>
+    </div>
+    <% if proof.description.present? %><p class="small muted"><%= truncate(proof.description, length: 140) %></p><% end %>
+    <% if proof.review_note.present? %><div class="pc-note"><%= icon("comment") %> <%= proof.review_note %></div><% end %>
+  </div>
+  <div class="pc-actions">
+    <%= link_to "Detalhes", proof_path(proof), class: "btn btn-ghost btn-sm" %>
+    <% if admin? %>
+      <% if proof.pending? %>
+        <%= button_to approve_proof_path(proof), class: "btn btn-primary btn-sm" do %><%= icon("check") %>Aprovar<% end %>
+        <%= form_with url: reject_proof_path(proof), class: "reject-form" do |f| %>
+          <%= f.text_field :review_note, placeholder: "Motivo (opcional)" %>
+          <%= f.button icon("xmark"), class: "btn btn-secondary btn-sm", title: "Recusar" %>
+        <% end %>
+      <% else %>
+        <span class="muted small"><%= proof.reviewed_by&.display_name %> · <%= datetime_br(proof.reviewed_at) %></span>
+        <%= button_to "Reabrir", reopen_proof_path(proof), class: "btn btn-ghost btn-sm", style: "margin-left:auto" %>
+      <% end %>
+    <% elsif proof.pending? %>
+      <%= link_to "Editar", edit_proof_path(proof), class: "btn btn-secondary btn-sm" %>
+    <% end %>
+  </div>
+</article>

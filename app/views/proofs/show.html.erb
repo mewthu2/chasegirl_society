@@ -1,0 +1,67 @@
+<% content_for :title, "#{@proof.kind_label} · #{@proof.influencer.name}" %>
+<% content_for :crumb_parent, link_to(admin? ? "Comprovações" : "Minhas comprovações", proofs_path) %>
+<% p = @proof %>
+
+<div class="page-head">
+  <div>
+    <div class="eyebrow"><%= month_label(p.month) %></div>
+    <h1><%= p.quantity %>× <%= p.kind_label %> <%= status_chip(p.status, p.status_label) %></h1>
+    <p class="lead"><%= p.influencer.name %> · publicado em <%= date_br(p.posted_on) || "—" %> · enviado em <%= datetime_br(p.created_at) %><%= " por #{p.submitted_by.display_name}" if p.submitted_by %></p>
+  </div>
+  <div class="actions">
+    <% if admin? || p.pending? %>
+      <%= link_to edit_proof_path(p), class: "btn btn-secondary" do %><%= icon("pen") %>Editar<% end %>
+    <% end %>
+    <% if p.pending? || admin? %>
+      <%= button_to proof_path(p), method: :delete, class: "btn btn-ghost", form: { data: { turbo_confirm: "Apagar esta comprovação?" } } do %><%= icon("trash") %>Apagar<% end %>
+    <% end %>
+  </div>
+</div>
+
+<div class="grid grid-main">
+  <div class="card">
+    <div class="card-head"><h2>Arquivos (<%= p.images.size %>)</h2></div>
+    <div class="card-body">
+      <% if p.images.attached? %>
+        <div class="gallery"><% p.images.each do |img| %><%= link_to media_thumb(img), url_for(img), target: "_blank", rel: "noopener" %><% end %></div>
+      <% else %>
+        <div class="empty"><i class="fa-solid fa-link"></i><b>Sem arquivos</b>Comprovação apenas por link.</div>
+      <% end %>
+    </div>
+  </div>
+
+  <div>
+    <div class="card">
+      <div class="card-head"><h2>Detalhes</h2></div>
+      <div class="card-body">
+        <dl class="dl">
+          <dt>Influenciadora</dt><dd><%= admin? ? link_to(p.influencer.name, influencer_path(p.influencer)) : p.influencer.name %></dd>
+          <dt>Canal</dt><dd><%= icon(channel_icon(p.kind)) %> <%= p.kind_label %></dd>
+          <dt>Quantidade</dt><dd><%= p.quantity %></dd>
+          <dt>Competência</dt><dd><%= month_label(p.month) %></dd>
+          <dt>Link</dt><dd><%= p.link.present? ? link_to(p.link, p.link, target: "_blank", rel: "noopener") : "—" %></dd>
+          <% if p.description.present? %><dt>Observação</dt><dd><%= p.description %></dd><% end %>
+          <% if p.reviewed_at %><dt>Análise</dt><dd><%= p.reviewed_by&.display_name %> · <%= datetime_br(p.reviewed_at) %></dd><% end %>
+          <% if p.review_note.present? %><dt>Motivo</dt><dd><%= p.review_note %></dd><% end %>
+        </dl>
+      </div>
+    </div>
+
+    <% if admin? %>
+      <div class="card">
+        <div class="card-head"><h2>Análise</h2></div>
+        <div class="card-body" style="display:grid;gap:12px">
+          <% if p.pending? %>
+            <%= button_to approve_proof_path(p), class: "btn btn-primary btn-block" do %><%= icon("check") %>Aprovar comprovação<% end %>
+            <%= form_with url: reject_proof_path(p), class: "form" do |f| %>
+              <div class="field"><%= f.label :review_note, "Motivo da recusa" %><%= f.text_field :review_note, placeholder: "Ex.: marcação @chasebrasil não aparece" %></div>
+              <%= f.button class: "btn btn-secondary btn-block" do %><%= icon("xmark") %>Recusar<% end %>
+            <% end %>
+          <% else %>
+            <%= button_to reopen_proof_path(p), class: "btn btn-secondary btn-block" do %><%= icon("rotate-left") %>Voltar para análise<% end %>
+          <% end %>
+        </div>
+      </div>
+    <% end %>
+  </div>
+</div>

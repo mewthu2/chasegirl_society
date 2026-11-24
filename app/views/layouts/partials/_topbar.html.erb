@@ -1,0 +1,16 @@
+<header class="topbar">
+  <button class="icon-btn mobile-toggle" type="button" data-action="shell#toggle" aria-label="Abrir menu"><%= icon("bars") %></button>
+  <nav class="crumbs" aria-label="Você está em">
+    <%= link_to icon("house"), root_path, title: "Início" %>
+    <% if content_for?(:crumb_parent) %>
+      <%= icon("chevron-right", class: "sep") %><%= yield :crumb_parent %>
+    <% end %>
+    <% if content_for?(:title) %>
+      <%= icon("chevron-right", class: "sep") %><span class="current"><%= yield :title %></span>
+    <% end %>
+  </nav>
+  <div class="top-actions">
+    <%= yield :top_actions %>
+    <span class="top-date hide-sm"><%= icon("calendar") %> <%= l(Date.current, format: "%d %b %Y") %></span>
+  </div>
+</header>

@@ -1,0 +1,4 @@
+<% content_for :title, "Editar usuário" %>
+<% content_for :crumb_parent, link_to("Equipe Chase", users_path) %>
+<div class="page-head"><div><h1>Editar <%= @user.display_name %></h1></div></div>
+<%= render "form", user: @user %>
