@@ -1,0 +1,33 @@
+<% s = @statement; i = s.influencer %>
+<% content_for :title, "#{i.name} · #{month_label(s.month)}" %>
+<% content_for :crumb_parent, link_to("Conferência", reviews_path(mes: month_param(s.month))) %>
+
+<div class="page-head">
+  <div>
+    <div class="eyebrow">Conferência · <%= month_label(s.month) %></div>
+    <h1><%= i.name %> <%= status_chip(s.review_status, s.review_label) %></h1>
+    <p class="lead">Chave PIX <span class="mono"><%= i.pix_key.presence || "a informar" %></span> · cupom <span class="mono"><%= i.coupon_code || "—" %></span> · combinado <%= brl(s.amount_contracted) %></p>
+  </div>
+  <div class="actions"><%= link_to "Ficha da influenciadora", influencer_path(i, mes: month_param(s.month)), class: "btn btn-secondary" %></div>
+</div>
+
+<%= render "shared/cycle", statement: s %>
+<div style="margin-top:16px"><%= render "shared/channels", statement: s %></div>
+
+<div class="card" style="margin-top:18px">
+  <div class="card-head"><h2>Decisão do mês</h2><span class="muted small" style="margin-left:auto">Sugestão pelos canais cumpridos: <b><%= brl(s.amount_due) %></b></span></div>
+  <div class="card-body">
+    <% if s.pending_total.positive? %><div class="callout" style="margin-bottom:14px"><%= icon("hourglass-half") %><span><%= s.pending_total %> entrega(s) ainda em análise neste mês. Confira as comprovações abaixo antes de decidir.</span></div><% end %>
+    <%= render "reviews/approve_form", statement: s %>
+    <% if s.reviewed_at %><p class="muted small" style="margin-top:10px">Decidido por <%= s.reviewed_by&.display_name %> em <%= datetime_br(s.reviewed_at) %></p><% end %>
+  </div>
+</div>
+
+<div class="card">
+  <div class="card-head"><h2>Comprovações do mês</h2></div>
+  <% if @proofs.any? %>
+    <div class="card-body"><div class="proof-cards"><%= render partial: "proofs/card", collection: @proofs, as: :proof %></div></div>
+  <% else %>
+    <div class="empty"><i class="fa-regular fa-images"></i><b>Nenhuma comprovação enviada</b></div>
+  <% end %>
+</div>

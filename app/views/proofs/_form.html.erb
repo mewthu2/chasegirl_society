@@ -11,7 +11,7 @@
       <% if portal %><span class="muted small" style="margin-left:auto">Link da publicação + fotos são obrigatórios</span><% end %>
     </div>
     <div class="card-body form-grid">
-      <% if admin? && proof.new_record? %>
+      <% if staff? && proof.new_record? %>
         <% if proof.influencer %>
           <%= f.hidden_field :influencer_id %>
         <% else %>
@@ -56,8 +56,8 @@
   </div>
 
   <div class="form-actions">
-    <% if admin? && proof.new_record? && !portal %><label class="check" style="margin-right:auto"><%= check_box_tag :approve_now, "1", false %> Já aprovar ao salvar</label><% end %>
-    <% unless portal %><%= link_to "Cancelar", proof.persisted? ? proof_path(proof) : (admin? ? proofs_path : portal_path), class: "btn btn-ghost" %><% end %>
+    <% if staff? && proof.new_record? && !portal %><label class="check" style="margin-right:auto"><%= check_box_tag :approve_now, "1", false %> Já aprovar ao salvar</label><% end %>
+    <% unless portal %><%= link_to "Cancelar", proof.persisted? ? proof_path(proof) : (staff? ? proofs_path : portal_path), class: "btn btn-ghost" %><% end %>
     <%= f.button class: "btn btn-primary btn-lg", data: { upload_target: "submit", turbo_submits_with: "Enviando…" } do %><%= icon("paper-plane") %><%= proof.persisted? ? "Salvar" : "Enviar comprovação" %><% end %>
   </div>
 <% end %>

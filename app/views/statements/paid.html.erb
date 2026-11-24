@@ -1,0 +1,28 @@
+<% content_for :title, "Pagos" %>
+<% content_for :crumb_parent, link_to("Financeiro", statements_path) %>
+<div class="page-head">
+  <div><div class="eyebrow">Financeiro · somente Admin</div><h1>Pagamentos realizados</h1><p class="lead">Histórico dos cachês pagos.</p></div>
+  <div class="actions"><%= link_to statements_path, class: "btn btn-secondary" do %><%= icon("wallet") %>A pagar<% end %></div>
+</div>
+<div class="card">
+  <div class="table-wrap">
+    <table class="table">
+      <thead><tr><th>Influenciadora</th><th>Competência</th><th>Pago em</th><th>Por</th><th class="right">Aprovado</th><th class="right">Pago</th><th></th></tr></thead>
+      <tbody>
+        <% @statements.each do |s| %>
+          <tr>
+            <td><%= link_to review_path(s), class: "person" do %><%= avatar(s.influencer.initials) %><span><b><%= s.influencer.name %></b><small>@<%= s.influencer.instagram %></small></span><% end %></td>
+            <td><%= month_label(s.month, short: true) %></td>
+            <td><%= datetime_br(s.paid_at) %></td>
+            <td class="muted"><%= s.paid_by&.display_name %></td>
+            <td class="right nowrap muted"><%= brl(s.amount_payable) %></td>
+            <td class="right nowrap"><b><%= brl(s.amount_paid) %></b></td>
+            <td class="right"><%= button_to icon("rotate-left"), unpay_statement_path(s), class: "icon-btn", title: "Desfazer pagamento", form: { data: { turbo_confirm: "Desfazer o pagamento de #{s.influencer.name}?" } } %></td>
+          </tr>
+        <% end %>
+        <% if @statements.empty? %><tr><td colspan="7"><div class="empty"><i class="fa-solid fa-check-double"></i><b>Nenhum pagamento registrado</b></div></td></tr><% end %>
+      </tbody>
+      <% if @statements.any? %><tfoot><tr><td colspan="5">Total</td><td class="right nowrap"><%= brl(@statements.sum { _1.amount_paid.to_d }) %></td><td></td></tr></tfoot><% end %>
+    </table>
+  </div>
+</div>

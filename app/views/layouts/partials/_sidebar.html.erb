@@ -7,20 +7,28 @@
   </div>
 
   <nav class="sb-nav">
-    <% if admin? %>
+    <% if staff? %>
       <% pending = Proof.pending.count %>
       <div class="sb-section-title">Visão geral</div>
       <%= nav_link "Painel", root_path, "chart-simple", desc: "Resumo do mês", active: controller_name == "dashboard" %>
 
       <div class="sb-section-title">Marketing</div>
       <%= nav_link "Influenciadoras", influencers_path, "users", desc: "Cadastro, metas e acessos", active: controller_name == "influencers" || controller_name == "portal" %>
-      <%= nav_link "Comprovações", proofs_path, "images", desc: "Prints e links para conferir", active: controller_name == "proofs", badge: pending %>
+      <%= nav_link "Comprovações", proofs_path, "images", desc: "Prints e links enviados", active: controller_name == "proofs", badge: pending %>
+      <% review_month = MonthlyStatement.review_month %>
+      <%= nav_link "Conferência", reviews_path, "magnifying-glass", desc: "#{month_label(review_month)} · até dia #{MonthlyStatement::REVIEW_DAYS}", active: controller_name == "reviews",
+            badge: (MonthlyStatement.phase(review_month) == :review ? MonthlyStatement.awaiting_review_count(review_month) : nil) %>
 
       <div class="sb-section-title">Financeiro</div>
-      <%= nav_link "A pagar", statements_path, "wallet", desc: "Cachês do mês e cupons", active: controller_name == "statements" %>
+      <%= nav_link "A pagar", statements_path, "wallet", desc: "Meses aprovados · dia 10", active: controller_name == "statements" && action_name != "paid", badge: MonthlyStatement.payable.count %>
+      <% if current_user.can_pay? %>
+        <%= nav_link "Pagos", paid_statements_path, "check-double", desc: "Histórico de pagamentos", active: controller_name == "statements" && action_name == "paid" %>
+      <% end %>
 
-      <div class="sb-section-title">Configurações</div>
-      <%= nav_link "Equipe Chase", users_path, "user-shield", desc: "Usuários administradores", active: controller_name == "users" %>
+      <% if current_user.can_manage_team? %>
+        <div class="sb-section-title">Configurações</div>
+        <%= nav_link "Equipe Chase", users_path, "user-shield", desc: "Admins e Gerentes", active: controller_name == "users" %>
+      <% end %>
     <% else %>
       <div class="sb-section-title">Minha parceria</div>
       <%= nav_link "Minha área", portal_path, "house", desc: "Metas e pagamentos", active: controller_name == "portal" %>
@@ -32,7 +40,7 @@
   <div class="sb-footer">
     <%= link_to edit_account_path, class: "sb-user" do %>
       <%= avatar(current_user.initials) %>
-      <span class="sb-txt"><span class="sb-label"><%= current_user.display_name %></span><span class="sb-desc"><%= current_user.admin? ? "Equipe Chase" : "Influenciadora" %></span></span>
+      <span class="sb-txt"><span class="sb-label"><%= current_user.display_name %></span><span class="sb-desc"><%= current_user.role_label %></span></span>
     <% end %>
     <%= button_to session_path, method: :delete, class: "icon-btn", title: "Sair", form: { data: { turbo: false } } do %><%= icon("arrow-right-from-bracket") %><% end %>
   </div>

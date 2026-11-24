@@ -1,6 +1,6 @@
 class DashboardController < ApplicationController
   def show
-    return redirect_to portal_path unless admin?
+    return redirect_to portal_path unless staff?
 
     @influencers = Influencer.active.ordered.select { _1.active_in?(selected_month) }
     @statements = @influencers.map { _1.statement_for(selected_month) }
@@ -9,7 +9,13 @@ class DashboardController < ApplicationController
 
     @goal_met = @statements.count(&:goal_met?)
     @amount_due = @statements.sum(&:amount_due)
-    @amount_paid = @statements.select(&:paid?).sum { _1.amount_paid.to_d }
+    payable = MonthlyStatement.payable
+    @payable_total = payable.sum(:amount_payable)
+    @payable_count = payable.count
+
+    @review_month = MonthlyStatement.review_month
+    @review_phase = MonthlyStatement.phase(@review_month)
+    @review_open = MonthlyStatement.awaiting_review_count(@review_month) if @review_phase == :review
     @contracted = @statements.sum(&:amount_contracted)
 
     @channel_totals = Influencer::CHANNELS.index_with do |kind|

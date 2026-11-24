@@ -6,7 +6,7 @@
   </div>
   <div class="pc-body">
     <div class="pc-top">
-      <% if admin? %>
+      <% if staff? %>
         <%= link_to influencer_path(proof.influencer), class: "person" do %><%= avatar(proof.influencer.initials) %><span><b><%= proof.influencer.name %></b><small>@<%= proof.influencer.instagram %></small></span><% end %>
       <% else %>
         <b><%= icon(channel_icon(proof.kind)) %> <%= proof.kind_label %></b>
@@ -25,7 +25,7 @@
   </div>
   <div class="pc-actions">
     <%= link_to "Detalhes", proof_path(proof), class: "btn btn-ghost btn-sm" %>
-    <% if admin? %>
+    <% if staff? %>
       <% if proof.pending? %>
         <%= button_to approve_proof_path(proof), class: "btn btn-primary btn-sm" do %><%= icon("check") %>Aprovar<% end %>
         <%= form_with url: reject_proof_path(proof), class: "reject-form" do |f| %>

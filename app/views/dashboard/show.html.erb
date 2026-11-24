@@ -8,9 +8,17 @@
   </div>
   <div class="actions">
     <%= month_switcher(:root_path) %>
-    <%= link_to new_influencer_path, class: "btn btn-primary" do %><%= icon("plus") %>Nova influenciadora<% end %>
+    <% if current_user.can_configure_contracts? %><%= link_to new_influencer_path, class: "btn btn-primary" do %><%= icon("plus") %>Nova influenciadora<% end %><% end %>
   </div>
 </div>
+
+<% if @review_phase == :review %>
+  <%= link_to reviews_path, class: "phase-banner", style: "color:inherit" do %>
+    <span class="ic"><%= icon("magnifying-glass") %></span>
+    <div class="grow"><b>Conferência de <%= month_label(@review_month) %> aberta até <%= date_br(MonthlyStatement.due_date(@review_month)) %></b><small><%= pluralize(@review_open, "influenciadora aguardando", "influenciadoras aguardando") %> aprovação · aprovar renova o cupom e cria o a pagar</small></div>
+    <span class="btn btn-primary btn-sm">Conferir <%= icon("arrow-right") %></span>
+  <% end %>
+<% end %>
 
 <div class="grid grid-4 stagger">
   <div class="card kpi">
@@ -24,23 +32,23 @@
     <%= progress_bar(@goal_met, @statements.size) %>
   </div>
   <div class="card kpi">
-    <div class="kpi-label"><%= icon("wallet") %>Cachê liberado</div>
+    <div class="kpi-label"><%= icon("wallet") %>Previsto no mês</div>
     <div class="kpi-value"><%= brl(@amount_due) %></div>
-    <div class="kpi-sub">de <%= brl(@contracted) %> contratados</div>
+    <div class="kpi-sub">pelos canais cumpridos · de <%= brl(@contracted) %></div>
     <%= progress_bar(@amount_due, @contracted) %>
   </div>
-  <div class="card kpi">
-    <div class="kpi-label"><%= icon("check-double") %>Já pago</div>
-    <div class="kpi-value"><%= brl(@amount_paid) %></div>
-    <div class="kpi-sub"><%= brl([@amount_due - @amount_paid, 0].max) %> pendente</div>
-  </div>
+  <%= link_to statements_path, class: "card kpi", style: "color:inherit" do %>
+    <div class="kpi-label"><%= icon("file-invoice-dollar") %>A pagar</div>
+    <div class="kpi-value"><%= brl(@payable_total) %></div>
+    <div class="kpi-sub"><%= pluralize(@payable_count, "mês aprovado", "meses aprovados") %> · dia 10</div>
+  <% end %>
 </div>
 
 <div class="grid grid-main" style="margin-top:18px">
   <div class="card">
     <div class="card-head">
       <h2>Acompanhamento individual</h2>
-      <div class="actions"><%= link_to "Ver financeiro", statements_path(mes: month_param(selected_month)), class: "btn btn-ghost btn-sm" %></div>
+      <div class="actions"><%= link_to "Ver conferência", reviews_path(mes: month_param(selected_month)), class: "btn btn-ghost btn-sm" %></div>
     </div>
     <div class="table-wrap">
       <table class="table">

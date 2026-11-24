@@ -1,0 +1,17 @@
+<% month = selected_month; phase = MonthlyStatement.phase(month) %>
+<div class="phase-banner">
+  <span class="ic"><%= icon({ running: "pen-to-square", review: "magnifying-glass", closed: "lock" }[phase]) %></span>
+  <div class="grow">
+    <% case phase %>
+    <% when :running %>
+      <b><%= month_label(month) %> ainda está em andamento</b>
+      <small>As influenciadoras entregam até <%= date_br(month.end_of_month) %>. A conferência vai de <%= date_br(MonthlyStatement.review_start(month)) %> a <%= date_br(MonthlyStatement.due_date(month)) %>.</small>
+    <% when :review %>
+      <b>Conferência de <%= month_label(month) %> aberta até <%= date_br(MonthlyStatement.due_date(month)) %></b>
+      <small>Aprovar o mês renova o cupom (+1 uso) e cria o a pagar do combinado. Pagamento dia <%= date_br(MonthlyStatement.due_date(month)) %>.</small>
+    <% else %>
+      <b>Conferência de <%= month_label(month) %> encerrada em <%= date_br(MonthlyStatement.due_date(month)) %></b>
+      <small>Ainda é possível aprovar quem ficou pendente: o a pagar é criado com vencimento em <%= date_br(MonthlyStatement.due_date(month)) %>.</small>
+    <% end %>
+  </div>
+</div>

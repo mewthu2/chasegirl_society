@@ -3,6 +3,7 @@
   <div class="card"><div class="card-body form-grid">
     <div class="field span-6"><%= f.label :name, "Nome" %><%= f.text_field :name %></div>
     <div class="field span-6"><%= f.label :email_address, "E-mail" %><%= f.email_field :email_address, required: true %></div>
+    <div class="field span-6"><%= f.label :role, "Perfil" %><%= f.select :role, [["Gerente — vê tudo, configura metas; no financeiro só o A pagar", "manager"], ["Admin — vê e faz tudo, inclusive pagamentos", "admin"]], {}, disabled: user == current_user %></div>
     <div class="field span-6"><%= f.label :password, user.persisted? ? "Nova senha (vazio mantém)" : "Senha" %><%= f.password_field :password, required: user.new_record?, autocomplete: "new-password" %></div>
   </div></div>
   <div class="form-actions"><%= link_to "Cancelar", users_path, class: "btn btn-ghost" %><%= f.button "Salvar", class: "btn btn-primary" %></div>

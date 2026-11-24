@@ -1,13 +1,13 @@
-<% content_for :title, admin? ? "Comprovações" : "Minhas comprovações" %>
+<% content_for :title, staff? ? "Comprovações" : "Minhas comprovações" %>
 
 <div class="page-head">
   <div>
-    <div class="eyebrow"><%= admin? ? "Marketing" : "Minha parceria" %></div>
-    <h1><%= admin? ? "Comprovações" : "Minhas comprovações" %></h1>
-    <p class="lead"><%= admin? ? "Confira os prints e links enviados pelas parceiras. Aprovar conta para a meta do mês." : "Tudo o que você enviou e a situação de cada envio." %></p>
+    <div class="eyebrow"><%= staff? ? "Marketing" : "Minha parceria" %></div>
+    <h1><%= staff? ? "Comprovações" : "Minhas comprovações" %></h1>
+    <p class="lead"><%= staff? ? "Confira os prints e links enviados pelas parceiras. Aprovar conta para a meta do mês." : "Tudo o que você enviou e a situação de cada envio." %></p>
   </div>
   <div class="actions">
-    <%= link_to new_proof_path, class: "btn btn-primary" do %><%= icon("cloud-arrow-up") %><%= admin? ? "Lançar comprovação" : "Enviar comprovação" %><% end %>
+    <%= link_to new_proof_path, class: "btn btn-primary" do %><%= icon("cloud-arrow-up") %><%= staff? ? "Lançar comprovação" : "Enviar comprovação" %><% end %>
   </div>
 </div>
 

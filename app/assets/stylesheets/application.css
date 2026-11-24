@@ -418,3 +418,21 @@ body.auth { min-height: 100vh; }
   .table.responsive tr { display: grid; grid-template-columns: 1fr auto; padding: 10px 6px; border-bottom: 1px solid var(--border); }
   .table.responsive td { border: 0; padding: 4px 8px; }
 }
+
+/* Ciclo do mês: entregas → conferência → pagamento → cupom */
+.cycle { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px; }
+.cycle-step { display: flex; gap: 10px; align-items: flex-start; padding: 12px 14px; border-radius: var(--r); border: 1px solid var(--border); background: var(--surface-2); color: var(--text-3); }
+.cycle-step b { display: block; font-size: 13px; color: var(--text-2); }
+.cycle-step small { font-size: 12px; }
+.cycle-dot { width: 26px; height: 26px; flex: none; border-radius: 50%; display: grid; place-items: center; font-size: 11px; border: 1px dashed #5a5a5a; }
+.cycle-step.is-done .cycle-dot { background: #3a3a3a; border: 0; color: #fff; }
+.cycle-step.is-current { border-color: rgba(255,255,255,.4); background: #1f1f1f; color: var(--text-2); }
+.cycle-step.is-current b { color: #fff; }
+.cycle-step.is-current .cycle-dot { background: #fff; color: #000; border: 0; box-shadow: 0 0 12px rgba(255,255,255,.35); }
+.phase-banner { display: flex; align-items: center; gap: 14px; padding: 14px 18px; border-radius: var(--r-lg); border: 1px solid var(--border-3); background: linear-gradient(120deg, #1d1d1d, #111); margin-bottom: 18px; flex-wrap: wrap; }
+.phase-banner .ic { width: 38px; height: 38px; border-radius: 11px; background: #fff; color: #000; display: grid; place-items: center; flex: none; }
+.phase-banner .grow { flex: 1; min-width: 200px; }
+.phase-banner small { color: var(--text-3); display: block; }
+.approve-form { display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
+.approve-form input[type=text] { width: 110px; min-height: 31px; padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-2); background: #0d0d0d; color: var(--text); font: inherit; font-size: 12.5px; }
+@media (max-width: 900px) { .cycle { grid-template-columns: 1fr 1fr; } }

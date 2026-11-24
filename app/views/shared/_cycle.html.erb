@@ -1,0 +1,27 @@
+<%# Situação do mês no ciclo: entregas → conferência (1 a 10) → pagamento (dia 10). locals: statement, show_amounts %>
+<% s = statement; phase = s.phase %>
+<div class="cycle">
+  <div class="cycle-step <%= 'is-current' if phase == :running %> <%= 'is-done' if phase != :running %>">
+    <span class="cycle-dot"><%= icon(phase == :running ? "pen-to-square" : "check") %></span>
+    <div><b>Entregas</b><small>até <%= date_br(s.month.end_of_month) %></small></div>
+  </div>
+  <div class="cycle-step <%= 'is-current' if phase == :review && s.review_open? %> <%= 'is-done' unless s.review_open? %>">
+    <span class="cycle-dot"><%= icon(s.review_open? ? "magnifying-glass" : (s.approved? ? "check" : "xmark")) %></span>
+    <div><b>Conferência</b><small><%= date_br(s.review_start) %> a <%= date_br(s.due_date) %> · <%= s.review_label %></small></div>
+  </div>
+  <div class="cycle-step <%= 'is-current' if s.approved? && !s.paid? %> <%= 'is-done' if s.paid? %>">
+    <span class="cycle-dot"><%= icon(s.paid? ? "check" : "wallet") %></span>
+    <div><b>Pagamento</b><small>
+      <% if s.paid? %>pago <%= brl(s.amount_paid) %> em <%= date_br(s.paid_at) %>
+      <% elsif s.approved? %><%= brl(s.amount_payable) %> · dia <%= date_br(s.due_date) %>
+      <% elsif s.rejected? %>mês reprovado
+      <% else %>dia <%= date_br(s.due_date) %><% end %>
+    </small></div>
+  </div>
+  <div class="cycle-step <%= 'is-done' if s.coupon_done? %>">
+    <span class="cycle-dot"><%= icon("ticket") %></span>
+    <div><b>Cupom</b><small><%= s.coupon_label %></small></div>
+  </div>
+</div>
+<% if s.review_note.present? %><div class="callout" style="margin-top:12px"><%= icon("comment") %><span><b>Conferência:</b> <%= s.review_note %></span></div><% end %>
+<% if s.coupon_error.present? && staff? %><div class="callout" style="margin-top:12px"><%= icon("triangle-exclamation") %><span><b>Cupom:</b> <%= s.coupon_error %></span></div><% end %>

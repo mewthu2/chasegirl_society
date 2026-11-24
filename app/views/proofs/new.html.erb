@@ -1,9 +1,9 @@
-<% content_for :title, admin? ? "Lançar comprovação" : "Enviar comprovação" %>
-<% content_for :crumb_parent, link_to(admin? ? "Comprovações" : "Minha área", admin? ? proofs_path : portal_path) %>
+<% content_for :title, staff? ? "Lançar comprovação" : "Enviar comprovação" %>
+<% content_for :crumb_parent, link_to(staff? ? "Comprovações" : "Minha área", staff? ? proofs_path : portal_path) %>
 <div class="page-head">
   <div>
     <div class="eyebrow">Comprovação</div>
-    <h1><%= admin? ? "Lançar comprovação" : "Enviar comprovação" %></h1>
+    <h1><%= staff? ? "Lançar comprovação" : "Enviar comprovação" %></h1>
     <p class="lead">Mande o print de cada story com a marcação da Chase. A equipe confere e a entrega entra na sua meta do mês.</p>
   </div>
 </div>

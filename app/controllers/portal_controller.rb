@@ -10,7 +10,7 @@ class PortalController < ApplicationController
   private
 
   def load_influencer
-    if admin?
+    if staff?
       @influencer = Influencer.find_by(id: params[:influencer_id])
       redirect_to influencers_path, notice: "Escolha uma influenciadora para ver a área dela." unless @influencer
     else

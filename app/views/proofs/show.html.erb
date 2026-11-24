@@ -1,5 +1,5 @@
 <% content_for :title, "#{@proof.kind_label} · #{@proof.influencer.name}" %>
-<% content_for :crumb_parent, link_to(admin? ? "Comprovações" : "Minhas comprovações", proofs_path) %>
+<% content_for :crumb_parent, link_to(staff? ? "Comprovações" : "Minhas comprovações", proofs_path) %>
 <% p = @proof %>
 
 <div class="page-head">
@@ -9,10 +9,10 @@
     <p class="lead"><%= p.influencer.name %> · publicado em <%= date_br(p.posted_on) || "—" %> · enviado em <%= datetime_br(p.created_at) %><%= " por #{p.submitted_by.display_name}" if p.submitted_by %></p>
   </div>
   <div class="actions">
-    <% if admin? || p.pending? %>
+    <% if staff? || p.pending? %>
       <%= link_to edit_proof_path(p), class: "btn btn-secondary" do %><%= icon("pen") %>Editar<% end %>
     <% end %>
-    <% if p.pending? || admin? %>
+    <% if p.pending? || staff? %>
       <%= button_to proof_path(p), method: :delete, class: "btn btn-ghost", form: { data: { turbo_confirm: "Apagar esta comprovação?" } } do %><%= icon("trash") %>Apagar<% end %>
     <% end %>
   </div>
@@ -35,7 +35,7 @@
       <div class="card-head"><h2>Detalhes</h2></div>
       <div class="card-body">
         <dl class="dl">
-          <dt>Influenciadora</dt><dd><%= admin? ? link_to(p.influencer.name, influencer_path(p.influencer)) : p.influencer.name %></dd>
+          <dt>Influenciadora</dt><dd><%= staff? ? link_to(p.influencer.name, influencer_path(p.influencer)) : p.influencer.name %></dd>
           <dt>Canal</dt><dd><%= icon(channel_icon(p.kind)) %> <%= p.kind_label %></dd>
           <dt>Quantidade</dt><dd><%= p.quantity %></dd>
           <dt>Competência</dt><dd><%= month_label(p.month) %></dd>
@@ -47,7 +47,7 @@
       </div>
     </div>
 
-    <% if admin? %>
+    <% if staff? %>
       <div class="card">
         <div class="card-head"><h2>Análise</h2></div>
         <div class="card-body" style="display:grid;gap:12px">

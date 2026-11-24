@@ -25,15 +25,25 @@ Rails.application.routes.draw do
     end
   end
 
+  # Conferência mensal (dia 1 a 10 do mês seguinte)
+  resources :reviews, path: "conferencia", only: %i[index show] do
+    member do
+      post :approve
+      post :reject
+      post :reopen
+      post :coupon
+    end
+  end
+
   # Módulo financeiro
   scope "financeiro" do
-    resources :statements, path: "a-pagar", only: %i[index show] do
+    resources :statements, path: "a-pagar", only: %i[index] do
       member do
         post :pay
         post :unpay
-        post :coupon
       end
     end
+    get "pagos", to: "statements#paid", as: :paid_statements
   end
 
   resources :users, path: "usuarios", except: :show

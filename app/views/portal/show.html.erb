@@ -1,8 +1,8 @@
-<% content_for :title, admin? ? "Área de #{@influencer.name}" : "Minha área" %>
+<% content_for :title, staff? ? "Área de #{@influencer.name}" : "Minha área" %>
 <% s = @statement; i = @influencer %>
-<% extra = admin? ? { influencer_id: i.id } : {} %>
+<% extra = staff? ? { influencer_id: i.id } : {} %>
 
-<% if admin? %>
+<% if staff? %>
   <div class="callout" style="margin-bottom:16px"><%= icon("eye") %><span>Você está vendo a área como <b><%= i.name %></b> enxerga. <%= link_to "Voltar para a ficha", influencer_path(i) %></span></div>
 <% end %>
 
@@ -12,7 +12,7 @@
     <div>
       <div class="eyebrow">Chasegirl Society · <%= month_label(selected_month) %></div>
       <h1>Oi, <%= i.name.split.first %>!</h1>
-      <p><%= s.goal_met? ? "Meta do mês batida. Obrigada! 🖤" : "Envie as provas das suas publicações para completar a meta do mês." %></p>
+      <p><%= if s.approved? then "Mês aprovado! Obrigada 🖤" elsif s.goal_met? then "Meta do mês completa. Agora é com a equipe Chase na conferência." else "Envie as provas das suas publicações para completar a meta do mês." end %></p>
     </div>
     <div class="actions">
       <%= month_switcher(:portal_path, **extra) %>
@@ -28,21 +28,14 @@
         proof: Proof.new(influencer: i, kind: (params[:kind].presence_in(i.channels) || i.channels.first), posted_on: Date.current, quantity: nil) %>
 </div>
 
-<div class="grid grid-3" style="margin-top:16px">
-  <div class="card kpi">
-    <div class="kpi-label"><%= icon("wallet") %>Cachê liberado no mês</div>
-    <div class="kpi-value"><%= brl(s.amount_due) %></div>
-    <div class="kpi-sub">de <%= brl(s.amount_contracted) %> · cada canal cumprido libera a sua parte</div>
+<div class="card" style="margin-top:16px">
+  <div class="card-head">
+    <h2>Como funciona o mês</h2>
+    <span class="muted small" style="margin-left:auto">Combinado <%= brl(s.amount_contracted) %> · cupom <span class="mono"><%= i.coupon_code || "—" %></span></span>
   </div>
-  <div class="card kpi">
-    <div class="kpi-label"><%= icon("receipt") %>Pagamento</div>
-    <div style="margin-top:12px"><%= status_chip(s.payment_status, s.payment_label) %></div>
-    <div class="kpi-sub"><%= s.paid? ? "#{brl(s.amount_paid)} pago em #{date_br(s.paid_at)}" : "Pagamento via PIX após o fechamento do mês" %></div>
-  </div>
-  <div class="card kpi">
-    <div class="kpi-label"><%= icon("ticket") %>Seu cupom</div>
-    <div class="code mono" style="font-size:19px;margin-top:8px;letter-spacing:.06em"><%= i.coupon_code || "—" %></div>
-    <div class="kpi-sub"><%= if s.coupon_done? then "Liberado mais 1 uso neste mês (permuta #{brl(i.permuta_value)})" elsif s.goal_met? then "Meta batida! A equipe Chase está liberando o seu cupom." else "Bata a meta do mês para liberar +1 uso" end %></div>
+  <div class="card-body">
+    <%= render "shared/cycle", statement: s %>
+    <p class="muted small" style="margin-top:12px">Você entrega até o fim do mês. Do dia 1 ao 10 do mês seguinte a equipe Chase confere; aprovado, o seu cupom ganha +1 uso (permuta de <%= brl(i.permuta_value) %>) e o pagamento sai no dia 10.</p>
   </div>
 </div>
 

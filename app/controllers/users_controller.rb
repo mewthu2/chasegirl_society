@@ -1,18 +1,18 @@
-# Equipe Chase (administradores). Acessos das influenciadoras ficam na ficha de cada uma.
+# Equipe Chase (Admin e Gerente). Acessos das influenciadoras ficam na ficha de cada uma.
 class UsersController < ApplicationController
   before_action :require_admin
   before_action :set_user, only: %i[edit update destroy]
 
   def index
-    @users = User.admins.order(:name, :email_address)
+    @users = User.staff.order(:role, :name, :email_address)
   end
 
   def new
-    @user = User.new(role: "admin")
+    @user = User.new(role: "manager")
   end
 
   def create
-    @user = User.new(user_params.merge(role: "admin"))
+    @user = User.new(user_params)
     if @user.save
       redirect_to users_path, notice: "Usuário criado."
     else
@@ -40,6 +40,12 @@ class UsersController < ApplicationController
 
   private
 
-  def set_user = @user = User.admins.find(params[:id])
-  def user_params = params.require(:user).permit(:name, :email_address, :password)
+  def set_user = @user = User.staff.find(params[:id])
+
+  def user_params
+    attrs = params.require(:user).permit(:name, :email_address, :password, :role)
+    attrs[:role] = "manager" unless User::STAFF_ROLES.include?(attrs[:role])
+    attrs.delete(:role) if @user == current_user # não rebaixa a si mesmo
+    attrs
+  end
 end

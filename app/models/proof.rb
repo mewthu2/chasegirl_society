@@ -46,11 +46,8 @@ class Proof < ApplicationRecord
   private
 
   def review!(new_status, by:, note:)
-    transaction do
-      update!(status: new_status, reviewed_by: new_status == "pending" ? nil : by,
-              reviewed_at: new_status == "pending" ? nil : Time.current, review_note: note)
-    end
-    influencer.statement_for(month).goal_reached!
+    update!(status: new_status, reviewed_by: new_status == "pending" ? nil : by,
+            reviewed_at: new_status == "pending" ? nil : Time.current, review_note: note)
   end
 
   def normalize_month

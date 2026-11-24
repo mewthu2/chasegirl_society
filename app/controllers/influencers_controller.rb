@@ -1,6 +1,11 @@
 class InfluencersController < ApplicationController
-  before_action :require_admin
+  before_action :require_staff
+  before_action :require_manager, only: %i[new create]
   before_action :set_influencer, except: %i[index new create]
+
+  # Metas, valores, cupom e vigência: só o perfil Gerente configura.
+  CONTRACT_FIELDS = %i[feed_goal stories_goal tiktok_goal cash_value permuta_value cash_is_permuta coupon_code starts_on ends_on].freeze
+  PROFILE_FIELDS = %i[name instagram tiktok city followers pix_key phone notes active].freeze
 
   def index
     scope = Influencer.ordered.includes(:user)
@@ -106,8 +111,7 @@ class InfluencersController < ApplicationController
   def set_influencer = @influencer = Influencer.find(params[:id])
 
   def influencer_params
-    params.require(:influencer).permit(:name, :instagram, :tiktok, :city, :followers, :coupon_code,
-      :feed_goal, :stories_goal, :tiktok_goal, :cash_value, :permuta_value, :cash_is_permuta,
-      :starts_on, :ends_on, :pix_key, :phone, :notes, :active)
+    allowed = PROFILE_FIELDS + (current_user.can_configure_contracts? ? CONTRACT_FIELDS : [])
+    params.require(:influencer).permit(*allowed)
   end
 end

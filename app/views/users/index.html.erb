@@ -1,16 +1,17 @@
 <% content_for :title, "Equipe Chase" %>
 <div class="page-head">
-  <div><div class="eyebrow">Configurações</div><h1>Equipe Chase</h1><p class="lead">Usuários administradores. O acesso de cada influenciadora fica na ficha dela.</p></div>
+  <div><div class="eyebrow">Configurações</div><h1>Equipe Chase</h1><p class="lead">Admin vê e faz tudo. Gerente vê tudo, é quem configura metas e valores, e no financeiro só vê o A pagar. O acesso de cada influenciadora fica na ficha dela.</p></div>
   <div class="actions"><%= link_to new_user_path, class: "btn btn-primary" do %><%= icon("plus") %>Novo usuário<% end %></div>
 </div>
 <div class="card">
   <div class="table-wrap">
     <table class="table">
-      <thead><tr><th>Nome</th><th>E-mail</th><th>Desde</th><th></th></tr></thead>
+      <thead><tr><th>Nome</th><th>Perfil</th><th>E-mail</th><th>Desde</th><th></th></tr></thead>
       <tbody>
         <% @users.each do |u| %>
           <tr>
             <td><span class="person"><%= avatar(u.initials) %><b><%= u.display_name %></b></span></td>
+            <td><span class="chip <%= u.admin? ? 'chip-approved' : 'chip-open' %>"><%= u.role_label %></span></td>
             <td class="mono small"><%= u.email_address %></td>
             <td class="muted"><%= date_br(u.created_at) %></td>
             <td><div class="row-actions">

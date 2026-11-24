@@ -30,12 +30,8 @@
       </div>
       <div class="card-body" style="display:grid;gap:16px">
         <%= render "shared/channels", statement: @statement %>
-        <div class="grid grid-3">
-          <div><div class="muted small">A pagar no mês</div><div class="kpi-value" style="font-size:22px;margin-top:2px"><%= brl(@statement.amount_due) %></div></div>
-          <div><div class="muted small">Pagamento</div><div style="margin-top:6px"><%= status_chip(@statement.payment_status, @statement.payment_label) %></div></div>
-          <div><div class="muted small">Cupom</div><div style="margin-top:6px"><%= status_chip(@statement.coupon_status, @statement.coupon_label) %></div></div>
-        </div>
-        <% if @statement.coupon_error.present? %><div class="callout"><%= icon("triangle-exclamation") %><span><%= @statement.coupon_error %></span></div><% end %>
+        <%= render "shared/cycle", statement: @statement %>
+        <div><%= link_to review_path(@statement), class: "btn btn-secondary btn-sm" do %><%= icon("magnifying-glass") %>Abrir conferência de <%= month_label(@statement.month) %><% end %></div>
       </div>
     </div>
 
@@ -115,9 +111,9 @@
       <div class="card-head"><h2>Histórico mensal</h2></div>
       <div class="list">
         <% @statements.each do |s| %>
-          <%= link_to statement_path(s), class: "list-item" do %>
-            <div class="grow"><b><%= month_label(s.month) %></b><div class="muted small"><%= s.progress_percent %>% das metas · <%= brl(s.amount_due) %></div></div>
-            <%= status_chip(s.payment_status, s.payment_label) %>
+          <%= link_to review_path(s), class: "list-item" do %>
+            <div class="grow"><b><%= month_label(s.month) %></b><div class="muted small"><%= s.progress_percent %>% das metas<%= " · #{brl(s.amount_payable)}" if s.approved? %></div></div>
+            <%= s.paid? ? status_chip("paid", "Pago") : status_chip(s.review_status, s.review_label) %>
           <% end %>
         <% end %>
         <% if @statements.empty? %><div class="empty">Sem histórico.</div><% end %>

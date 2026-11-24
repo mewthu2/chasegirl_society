@@ -1,5 +1,9 @@
 class User < ApplicationRecord
-  ROLES = %w[admin influencer].freeze
+  # admin: vê e faz tudo (inclui pagar). manager (Gerente): vê tudo, configura metas/valores,
+  # no financeiro só vê o "A pagar". influencer (Usuário): só a própria área.
+  ROLES = %w[admin manager influencer].freeze
+  ROLE_LABELS = { "admin" => "Admin", "manager" => "Gerente", "influencer" => "Usuário (influenciadora)" }.freeze
+  STAFF_ROLES = %w[admin manager].freeze
 
   has_secure_password
   has_many :sessions, dependent: :destroy
@@ -12,10 +16,19 @@ class User < ApplicationRecord
   validates :influencer, presence: true, if: :influencer?
   validates :password, length: { minimum: 6 }, allow_nil: true
 
-  scope :admins, -> { where(role: "admin") }
+  scope :staff, -> { where(role: STAFF_ROLES) }
 
   def admin? = role == "admin"
+  def manager? = role == "manager"
+  def staff? = STAFF_ROLES.include?(role)
   def influencer? = role == "influencer"
+  def role_label = ROLE_LABELS[role]
+
+  # Permissões
+  def can_configure_contracts? = manager?
+  def can_review? = staff?
+  def can_pay? = admin?
+  def can_manage_team? = admin?
 
   def display_name
     name.presence || influencer&.name || email_address

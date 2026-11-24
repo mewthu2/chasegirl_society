@@ -1,87 +1,65 @@
 <% content_for :title, "A pagar" %>
 <% content_for :crumb_parent, tag.span("Financeiro") %>
-<% open_total = @statements.reject(&:paid?).sum(&:amount_due) %>
-<% paid_total = @statements.select(&:paid?).sum { _1.amount_paid.to_d } %>
+<% total = @statements.sum { _1.amount_payable.to_d } %>
+<% by_due = @statements.group_by(&:due_on) %>
 
 <div class="page-head">
   <div>
     <div class="eyebrow">Financeiro</div>
-    <h1>A pagar · <%= month_label(selected_month) %></h1>
-    <p class="lead">Cachê liberado por canal cumprido (33,33% cada com TikTok, 50% sem). Registre o PIX quando pagar.</p>
+    <h1>A pagar</h1>
+    <p class="lead">Criado automaticamente quando o mês é aprovado na conferência. Pagamento no dia 10.</p>
   </div>
   <div class="actions">
-    <%= month_switcher(:statements_path, filtro: params[:filtro]) %>
-    <%= link_to statements_path(format: :csv, mes: month_param(selected_month), filtro: params[:filtro]), class: "btn btn-secondary" do %><%= icon("file-csv") %>Exportar<% end %>
+    <%= link_to statements_path(format: :csv), class: "btn btn-secondary" do %><%= icon("file-csv") %>Exportar<% end %>
+    <% if current_user.can_pay? %><%= link_to paid_statements_path, class: "btn btn-ghost" do %><%= icon("check-double") %>Pagos<% end %><% end %>
   </div>
 </div>
 
-<div class="grid grid-4 stagger">
-  <div class="card kpi"><div class="kpi-label"><%= icon("clock") %>Em aberto</div><div class="kpi-value"><%= brl(open_total) %></div><div class="kpi-sub"><%= pluralize(@statements.count { !_1.paid? && _1.amount_due.positive? }, "pagamento") %></div></div>
-  <div class="card kpi"><div class="kpi-label"><%= icon("check-double") %>Pago</div><div class="kpi-value"><%= brl(paid_total) %></div><div class="kpi-sub"><%= pluralize(@statements.count(&:paid?), "pagamento") %></div></div>
-  <div class="card kpi"><div class="kpi-label"><%= icon("file-signature") %>Contratado</div><div class="kpi-value"><%= brl(@statements.sum(&:amount_contracted)) %></div><div class="kpi-sub">se todas baterem 100%</div></div>
-  <div class="card kpi"><div class="kpi-label"><%= icon("ticket") %>Cupons liberados</div><div class="kpi-value"><%= @statements.count(&:coupon_done?) %></div><div class="kpi-sub"><%= pluralize(@statements.count(&:goal_met?), "meta batida", "metas batidas") %></div></div>
+<div class="grid grid-3 stagger">
+  <div class="card kpi"><div class="kpi-label"><%= icon("wallet") %>Total a pagar</div><div class="kpi-value"><%= brl(total) %></div><div class="kpi-sub"><%= pluralize(@statements.size, "pagamento") %></div></div>
+  <div class="card kpi"><div class="kpi-label"><%= icon("calendar") %>Próximo vencimento</div><div class="kpi-value"><%= date_br(by_due.keys.compact.min) || "—" %></div><div class="kpi-sub"><%= brl(by_due[by_due.keys.compact.min].to_a.sum { _1.amount_payable.to_d }) %></div></div>
+  <div class="card kpi"><div class="kpi-label"><%= icon("triangle-exclamation") %>Vencidos</div><% late = @statements.select { _1.due_on && _1.due_on < Date.current } %><div class="kpi-value"><%= late.size %></div><div class="kpi-sub"><%= brl(late.sum { _1.amount_payable.to_d }) %></div></div>
 </div>
 
-<div class="card" style="margin-top:18px">
-  <div class="toolbar">
-    <div class="seg">
-      <% { "todas" => "Todas", "a_pagar" => "A pagar", "pagas" => "Pagas", "sem_entrega" => "Sem valor liberado" }.each do |key, label| %>
-        <%= link_to label, statements_path(mes: month_param(selected_month), filtro: key), class: ("is-active" if @filter == key) %>
-      <% end %>
+<% if @statements.empty? %>
+  <div class="card" style="margin-top:18px"><div class="empty"><i class="fa-solid fa-wallet"></i><b>Nada a pagar</b>Os pagamentos aparecem aqui quando o mês é aprovado na <%= link_to "conferência", reviews_path %>.</div></div>
+<% end %>
+
+<% by_due.sort_by { |d, _| d || Date.new(3000) }.each do |due, list| %>
+  <div class="card" style="margin-top:18px">
+    <div class="card-head">
+      <h2>Vencimento <%= date_br(due) %><% if due && due < Date.current %> <span class="chip chip-error">Vencido</span><% end %></h2>
+      <span class="muted" style="margin-left:auto"><%= pluralize(list.size, "pagamento") %> · <b style="color:var(--text)"><%= brl(list.sum { _1.amount_payable.to_d }) %></b></span>
+    </div>
+    <div class="table-wrap">
+      <table class="table">
+        <thead><tr><th>Influenciadora</th><th>Chave PIX</th><th>Competência</th><th>Aprovado por</th><th class="right">Valor</th><th class="right"><%= current_user.can_pay? ? "Pagamento" : "" %></th></tr></thead>
+        <tbody>
+          <% list.each do |s| %>
+            <% i = s.influencer %>
+            <tr>
+              <td><%= link_to review_path(s), class: "person" do %><%= avatar(i.initials) %><span><b><%= i.name %></b><small>@<%= i.instagram %></small></span><% end %></td>
+              <td class="mono small"><%= i.pix_key.presence || tag.span("a informar", class: "muted") %></td>
+              <td><%= month_label(s.month, short: true) %></td>
+              <td class="small muted"><%= s.reviewed_by&.display_name %> · <%= date_br(s.reviewed_at) %></td>
+              <td class="right nowrap"><b><%= brl(s.amount_payable) %></b></td>
+              <td class="right">
+                <% if current_user.can_pay? %>
+                  <details class="inline-pay">
+                    <summary class="btn btn-primary btn-sm"><%= icon("check") %>Marcar pago</summary>
+                    <%= form_with url: pay_statement_path(s), class: "pay-pop" do |f| %>
+                      <%= f.text_field :amount, value: number_with_precision(s.amount_payable, precision: 2, separator: ",", delimiter: "."), inputmode: "decimal", title: "Valor pago" %>
+                      <%= f.button "Confirmar", class: "btn btn-secondary btn-sm" %>
+                    <% end %>
+                  </details>
+                <% else %>
+                  <%= status_chip("open", "A pagar") %>
+                <% end %>
+              </td>
+            </tr>
+          <% end %>
+        </tbody>
+      </table>
     </div>
   </div>
-  <div class="table-wrap">
-    <table class="table">
-      <thead>
-        <tr><th>Influenciadora</th><th>Chave PIX</th><% Influencer::CHANNELS.each do |k| %><th><%= Influencer.channel_label(k) %></th><% end %><th class="right">Contratado</th><th class="right">A pagar</th><th>Cupom</th><th class="right">Pagamento</th></tr>
-      </thead>
-      <tbody>
-        <% @statements.each do |s| %>
-          <% i = s.influencer %>
-          <tr>
-            <td><%= link_to statement_path(s), class: "person" do %><%= avatar(i.initials) %><span><b><%= i.name %></b><small>@<%= i.instagram %></small></span><% end %></td>
-            <td class="mono small"><%= i.pix_key.presence || tag.span("a informar", class: "muted") %></td>
-            <% Influencer::CHANNELS.each do |k| %>
-              <td class="nowrap">
-                <% if i.goal_for(k).positive? %>
-                  <span title="<%= percent(i.share_percent(k)) %> · <%= brl(i.channel_value(k)) %>"><%= s.channel_met?(k) ? icon("circle-check") : icon("circle", class: "muted") %> <%= s.delivered_for(k) %>/<%= i.goal_for(k) %></span>
-                <% else %><span class="muted">—</span><% end %>
-              </td>
-            <% end %>
-            <td class="right nowrap muted"><%= brl(s.amount_contracted) %></td>
-            <td class="right nowrap"><b><%= brl(s.amount_due) %></b></td>
-            <td>
-              <% if s.goal_met? && !s.coupon_done? && i.coupon_code.present? %>
-                <%= button_to coupon_statement_path(s), class: "btn btn-secondary btn-sm", title: s.coupon_error do %><%= icon("rotate") %>Liberar cupom<% end %>
-              <% else %>
-                <%= status_chip(s.coupon_status, s.coupon_label) %>
-              <% end %>
-            </td>
-            <td class="right">
-              <% if s.paid? %>
-                <div class="row-actions">
-                  <span title="<%= datetime_br(s.paid_at) %> · <%= s.paid_by&.display_name %>"><%= status_chip("paid", brl(s.amount_paid)) %></span>
-                  <%= button_to icon("rotate-left"), unpay_statement_path(s), class: "icon-btn", title: "Desfazer pagamento", form: { data: { turbo_confirm: "Desfazer o pagamento de #{i.name}?" } } %>
-                </div>
-              <% elsif s.amount_due.positive? %>
-                <details class="inline-pay">
-                  <summary class="btn btn-primary btn-sm"><%= icon("check") %>Marcar pago</summary>
-                  <%= form_with url: pay_statement_path(s), class: "pay-pop" do |f| %>
-                    <%= f.text_field :amount, value: number_with_precision(s.amount_due, precision: 2, separator: ",", delimiter: "."), inputmode: "decimal", title: "Valor pago" %>
-                    <%= f.button "Confirmar", class: "btn btn-secondary btn-sm" %>
-                  <% end %>
-                </details>
-              <% else %>
-                <span class="muted small">Nada liberado</span>
-              <% end %>
-            </td>
-          </tr>
-        <% end %>
-        <% if @statements.empty? %><tr><td colspan="9"><div class="empty"><i class="fa-solid fa-wallet"></i><b>Nada para mostrar</b></div></td></tr><% end %>
-      </tbody>
-      <% if @statements.any? %>
-        <tfoot><tr><td colspan="5">Total (<%= @statements.size %>)</td><td class="right nowrap"><%= brl(@statements.sum(&:amount_contracted)) %></td><td class="right nowrap"><%= brl(@statements.sum(&:amount_due)) %></td><td colspan="2"></td></tr></tfoot>
-      <% end %>
-    </table>
-  </div>
-</div>
+<% end %>
