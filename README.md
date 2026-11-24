@@ -9,6 +9,8 @@ o sistema calcula o cachê do mês e libera +1 uso no cupom da Shopify quando a 
   Cada canal cumprido no mês (comprovações aprovadas ≥ meta) libera a sua parte.
 - **Permuta** = valor do cupom. Quando todas as metas do mês são batidas, o `usageLimit` do código de desconto
   na Shopify aumenta em 1 (uma vez por mês). Se falhar, o botão "Liberar cupom" em Financeiro › A pagar tenta de novo.
+- **Comprovação** exige link da publicação **e** foto. A influenciadora lança direto na "Minha área".
+- **E-mails**: envio do acesso (login + senha) pela ficha da influenciadora e "Esqueci minha senha" no login.
 - **Financeiro › A pagar**: valor liberado por mês, marcar como pago, exportar CSV.
 
 ## Configuração (Heroku)
@@ -17,6 +19,7 @@ o sistema calcula o cachê do mês e libera +1 uso no cupom da Shopify quando a 
 | `SECRET_KEY_BASE` | sessões |
 | `SHOPIFY_ACCESS_TOKEN` | token Admin API com `read_discounts` e `write_discounts` |
 | `SHOPIFY_SHOP` | padrão `chasebrasil.myshopify.com` |
+| `AWS_SES_ACCESS_KEY_ID`, `AWS_SES_SECRET_ACCESS_KEY`, `AWS_SES_REGION`, `MAILER_FROM` | e-mails pelo Amazon SES (mesma conta do chase-orders, domínio chasebrasil.com) |
 | `BUCKETEER_*` | criadas pelo add-on Bucketeer: os prints ficam nesse bucket S3 (sem ele, caem no Postgres) |
 
 ## Comandos

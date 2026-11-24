@@ -1,5 +1,6 @@
 Rails.application.routes.draw do
   resource :session, only: %i[new create destroy]
+  resources :passwords, param: :token, only: %i[new create edit update]
   resource :account, only: %i[edit update]
 
   root "dashboard#show"
@@ -11,6 +12,7 @@ Rails.application.routes.draw do
     member do
       post :access, to: "influencers#save_access"
       delete :access, to: "influencers#revoke_access"
+      post :send_access
       get :coupon
     end
   end

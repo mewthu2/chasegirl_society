@@ -1,0 +1,7 @@
+<% content_for :preheader, "Link para criar uma nova senha. Vale por 15 minutos." %>
+<% content_for :badge, "Sua conta" %>
+<% content_for :hero_title, "Redefinir sua senha" %>
+<p style="margin:0 0 6px;">Recebemos um pedido para redefinir a senha de <strong><%= @user.email_address %></strong>.</p>
+<%= render "shared/mail_button", url: @url, label: "Criar nova senha" %>
+<p style="margin:0;color:#6a6a6a;font-size:13px;">O link vale por 15 minutos e só pode ser usado uma vez. Se não foi você, ignore este e-mail: sua senha continua a mesma.</p>
+<% content_for :why, "Alguém pediu \"Esqueci minha senha\" na tela de login da Chasegirl Society com este e-mail." %>

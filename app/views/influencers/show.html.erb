@@ -67,7 +67,8 @@
       <div class="card-body">
         <%= form_with url: access_influencer_path(i), scope: :access, class: "form", data: { turbo: false } do |f| %>
           <div class="field"><%= f.label :email_address, "E-mail de login" %><%= f.email_field :email_address, value: i.user&.email_address, required: true %></div>
-          <div class="field"><%= f.label :password, i.user ? "Nova senha (deixe vazio para manter)" : "Senha" %><%= f.text_field :password, required: i.user.nil?, autocomplete: "off", placeholder: "mín. 6 caracteres", value: (i.user ? nil : "chase@#{Date.current.year}") %></div>
+          <div class="field"><%= f.label :password, i.user ? "Nova senha (deixe vazio para manter)" : "Senha" %><%= f.text_field :password, required: i.user.nil?, autocomplete: "off", placeholder: "mín. 6 caracteres", value: (i.user ? nil : InfluencersController.generate_password) %></div>
+          <label class="check"><%= check_box_tag :send_email, "1", true %> Enviar login e senha por e-mail para ela</label>
           <div class="form-actions" style="justify-content:space-between">
             <% if i.user %>
               <%= link_to "Remover acesso", access_influencer_path(i), class: "btn btn-ghost btn-sm", data: { turbo_method: :delete, turbo_confirm: "Remover o acesso de #{i.name}?" } %>
@@ -75,7 +76,11 @@
             <%= f.button class: "btn btn-primary btn-sm" do %><%= icon("key") %><%= i.user ? "Atualizar acesso" : "Criar acesso" %><% end %>
           </div>
         <% end %>
-        <% if i.user %><p class="muted small" style="margin-top:10px">Ela entra em <b><%= request.host %></b> com <span class="mono"><%= i.user.email_address %></span>.</p><% end %>
+        <% if i.user %>
+          <p class="muted small" style="margin-top:12px">Ela entra em <b><%= request.host %></b> com <span class="mono"><%= i.user.email_address %></span>.
+            <%= i.user.access_sent_at ? "Acesso enviado por e-mail em #{datetime_br(i.user.access_sent_at)}." : "Acesso ainda não enviado por e-mail." %></p>
+          <%= button_to send_access_influencer_path(i), class: "btn btn-secondary btn-sm btn-block", style: "margin-top:10px", form: { style: "display:block", data: { turbo_confirm: "Gerar uma senha nova para #{i.name} e enviar por e-mail para #{i.user.email_address}?" } } do %><%= icon("envelope") %>Gerar nova senha e enviar por e-mail<% end %>
+        <% end %>
       </div>
     </div>
 

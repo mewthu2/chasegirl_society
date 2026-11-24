@@ -1,21 +1,5 @@
 <div class="login">
-  <section class="login-brand">
-    <div class="aurora"><span></span><span></span><span></span></div>
-    <div class="grid-lines"></div>
-    <div class="sb-brand">
-      <span class="brand-mark">C</span>
-      <span class="brand-txt"><b>CHASEGIRL</b><small>society</small></span>
-    </div>
-    <div>
-      <div class="big">Chasegirl<br><em>Society.</em></div>
-      <p class="tagline">O espaço das parceiras Chase: envie as provas dos seus stories, posts e TikToks, acompanhe as metas do mês e o seu pagamento.</p>
-    </div>
-    <div class="login-features">
-      <div><i class="fa-solid fa-cloud-arrow-up"></i>Envie os prints direto do celular</div>
-      <div><i class="fa-solid fa-chart-simple"></i>Acompanhe Feed, Stories e TikTok do mês</div>
-      <div><i class="fa-solid fa-ticket"></i>Meta batida libera o seu cupom</div>
-    </div>
-  </section>
+  <%= render "sessions/brand_side" %>
 
   <section class="login-form-side">
     <div class="login-card">
@@ -35,7 +19,7 @@
         </div>
         <%= form.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
       <% end %>
-      <p class="muted small">Esqueceu a senha? Fale com a equipe Chase para redefinir.</p>
+      <p class="muted small"><%= link_to "Esqueci minha senha", new_password_path %></p>
     </div>
   </section>
 </div>

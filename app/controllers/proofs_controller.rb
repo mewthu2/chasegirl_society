@@ -17,7 +17,7 @@ class ProofsController < ApplicationController
 
   def new
     @proof = Proof.new(influencer: default_influencer, kind: params[:kind].presence || "stories",
-                       posted_on: Date.current, quantity: 1)
+                       posted_on: Date.current)
   end
 
   def create
@@ -27,6 +27,9 @@ class ProofsController < ApplicationController
     if @proof.save
       @proof.approve!(by: current_user) if admin? && params[:approve_now] == "1"
       redirect_to after_save_path, notice: "Comprovação enviada! A equipe Chase vai conferir."
+    elsif params[:return_to] == "portal"
+      redirect_to portal_path(influencer_id: (@proof.influencer_id if admin?), mes: params[:mes], kind: @proof.kind, anchor: "comprovar"),
+                  alert: "Não enviada: #{@proof.errors.full_messages.to_sentence}"
     else
       render :new, status: :unprocessable_entity
     end
@@ -89,7 +92,13 @@ class ProofsController < ApplicationController
   end
 
   def after_save_path
-    admin? ? (params[:return_to] == "influencer" ? influencer_path(@proof.influencer) : proofs_path) : portal_path(mes: @proof.month.strftime("%Y-%m"))
+    mes = @proof.month.strftime("%Y-%m")
+    return portal_path(mes:) unless admin?
+    case params[:return_to]
+    when "portal" then portal_path(influencer_id: @proof.influencer_id, mes:)
+    when "influencer" then influencer_path(@proof.influencer)
+    else proofs_path
+    end
   end
 
   def approval_notice

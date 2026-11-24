@@ -16,12 +16,17 @@
     </div>
     <div class="actions">
       <%= month_switcher(:portal_path, **extra) %>
-      <% unless admin? %><%= link_to new_proof_path, class: "btn btn-primary btn-lg" do %><%= icon("cloud-arrow-up") %>Enviar comprovação<% end %><% end %>
+      <%= link_to "#comprovar", class: "btn btn-primary btn-lg" do %><%= icon("camera") %>Enviar fotos<% end %>
     </div>
   </div>
 </div>
 
-<%= render "shared/channels", statement: s %>
+<%= render "shared/channels", statement: s, upload_link: ->(kind) { portal_path(extra.merge(mes: month_param(selected_month), kind:, anchor: "comprovar")) } %>
+
+<div id="comprovar" style="margin-top:18px;scroll-margin-top:80px">
+  <%= render "proofs/form", portal: true,
+        proof: Proof.new(influencer: i, kind: (params[:kind].presence_in(i.channels) || i.channels.first), posted_on: Date.current, quantity: nil) %>
+</div>
 
 <div class="grid grid-3" style="margin-top:16px">
   <div class="card kpi">

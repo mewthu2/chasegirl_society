@@ -52,13 +52,32 @@ class InfluencersController < ApplicationController
     user = @influencer.user || @influencer.build_user(role: "influencer")
     attrs = params.require(:access).permit(:email_address, :password)
     attrs.delete(:password) if attrs[:password].blank? && user.persisted?
+    password_changed = attrs[:password].present?
     user.assign_attributes(attrs.merge(name: @influencer.name, role: "influencer"))
-    if user.save
-      user.sessions.destroy_all if attrs[:password].present? && user.previously_new_record? == false
-      redirect_to @influencer, notice: "Acesso salvo para #{user.email_address}."
-    else
-      redirect_to @influencer, alert: "Não foi possível salvar o acesso: #{user.errors.full_messages.to_sentence}"
+
+    unless user.save
+      return redirect_to @influencer, alert: "Não foi possível salvar o acesso: #{user.errors.full_messages.to_sentence}"
     end
+
+    user.sessions.destroy_all if password_changed && !user.previously_new_record?
+    if params[:send_email] == "1" && password_changed
+      deliver_access(user, attrs[:password], "Acesso salvo")
+    else
+      redirect_to @influencer, notice: "Acesso salvo para #{user.email_address}."
+    end
+  end
+
+  # Gera uma senha nova e manda login + senha por e-mail.
+  def send_access
+    user = @influencer.user or return redirect_to(@influencer, alert: "Crie o acesso antes de enviar.")
+    password = self.class.generate_password
+    user.update!(password:)
+    user.sessions.destroy_all
+    deliver_access(user, password, "Nova senha gerada")
+  end
+
+  def self.generate_password
+    "chase-#{SecureRandom.alphanumeric(6).downcase}"
   end
 
   def revoke_access
@@ -74,6 +93,15 @@ class InfluencersController < ApplicationController
   end
 
   private
+
+  def deliver_access(user, password, prefix)
+    InfluencerMailer.access(user, password).deliver_now
+    user.update_column(:access_sent_at, Time.current)
+    redirect_to @influencer, notice: "#{prefix} e enviado por e-mail para #{user.email_address}."
+  rescue StandardError => e
+    Rails.logger.error("[InfluencerMailer] #{e.class}: #{e.message}")
+    redirect_to @influencer, alert: "#{prefix}, mas o e-mail falhou (#{e.message}). Senha: #{password}"
+  end
 
   def set_influencer = @influencer = Influencer.find(params[:id])
 

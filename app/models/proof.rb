@@ -14,6 +14,7 @@ class Proof < ApplicationRecord
   validates :status, inclusion: { in: STATUSES }
   validates :month, presence: true
   validates :quantity, numericality: { only_integer: true, greater_than: 0, less_than_or_equal_to: 30 }
+  validates :link, presence: { message: "da publicação é obrigatório" }
   validates :link, format: { with: %r{\Ahttps?://}i, message: "precisa começar com http:// ou https://" }, allow_blank: true
   validate :evidence_present
   validate :images_are_valid
@@ -53,11 +54,14 @@ class Proof < ApplicationRecord
   end
 
   def normalize_month
+    self.link = link.to_s.strip.presence && (link.strip.match?(%r{\Ahttps?://}i) ? link.strip : "https://#{link.strip}")
+    # Sem quantidade informada: em Stories conta 1 por foto enviada; nos demais, 1.
+    self.quantity = (kind == "stories" && images.attached? ? [images.size, 1].max : 1) if quantity.blank?
     self.month = (month || posted_on || Date.current).to_date.beginning_of_month
   end
 
   def evidence_present
-    errors.add(:images, "envie pelo menos um print ou informe o link da publicação") if !images.attached? && link.blank?
+    errors.add(:images, "envie pelo menos uma foto/print da publicação") unless images.attached?
   end
 
   def images_are_valid

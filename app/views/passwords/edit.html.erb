@@ -1,0 +1,13 @@
+<div class="login">
+  <%= render "sessions/brand_side" %>
+  <section class="login-form-side">
+    <div class="login-card">
+      <div><div class="eyebrow">Acesso</div><h2>Nova senha</h2><p class="muted"><%= @user.email_address %></p></div>
+      <%= form_with url: password_path(params[:token]), method: :put, class: "form", data: { turbo: false } do |f| %>
+        <div class="field"><%= f.label :password, "Nova senha" %><%= f.password_field :password, required: true, minlength: 6, autocomplete: "new-password", maxlength: 72 %></div>
+        <div class="field"><%= f.label :password_confirmation, "Repita a nova senha" %><%= f.password_field :password_confirmation, required: true, autocomplete: "new-password", maxlength: 72 %></div>
+        <%= f.button "Salvar nova senha", class: "btn btn-primary btn-lg btn-block" %>
+      <% end %>
+    </div>
+  </section>
+</div>

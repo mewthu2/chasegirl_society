@@ -1,0 +1,13 @@
+<div class="login">
+  <%= render "sessions/brand_side" %>
+  <section class="login-form-side">
+    <div class="login-card">
+      <div><div class="eyebrow">Acesso</div><h2>Esqueci minha senha</h2><p class="muted">Informe seu e-mail de login. Enviaremos um link para criar uma nova senha.</p></div>
+      <%= form_with url: passwords_path, class: "form", data: { turbo: false } do |f| %>
+        <div class="field"><%= f.label :email_address, "E-mail" %><%= f.email_field :email_address, required: true, autofocus: true, placeholder: "voce@email.com" %></div>
+        <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Enviar link <i class="fa-solid fa-paper-plane"></i><% end %>
+      <% end %>
+      <p class="muted small"><%= link_to "← Voltar para o login", new_session_path %></p>
+    </div>
+  </section>
+</div>

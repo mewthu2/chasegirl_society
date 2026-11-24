@@ -17,7 +17,8 @@ class MonthlyStatementTest < ActiveSupport::TestCase
   end
 
   def proof(kind, qty = 1)
-    @inf.proofs.create!(kind:, quantity: qty, posted_on: @month + 3, link: "https://instagram.com/p/x")
+    @inf.proofs.create!(kind:, quantity: qty, posted_on: @month + 3, link: "https://instagram.com/p/x",
+                        images: [fixture_file_upload("story.png", "image/png")])
   end
 
   test "libera a parte de cada canal cumprido" do

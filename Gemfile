@@ -60,3 +60,5 @@ gem "active_storage_db", "~> 1.6"
 gem "rails-i18n", "~> 8.1"
 
 gem "csv", "~> 3.3"
+
+gem "aws-actionmailer-ses", "~> 1.2"
