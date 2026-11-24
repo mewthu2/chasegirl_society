@@ -1,8 +1,7 @@
 <aside class="sidebar" aria-label="Menu principal">
   <div class="sb-header">
-    <%= link_to root_path, class: "sb-brand" do %>
-      <span class="brand-mark">C</span>
-      <span class="brand-txt"><b>CHASEGIRL</b><small>society</small></span>
+    <%= link_to root_path, class: "sb-brand", "aria-label": "Chase Society · início" do %>
+      <%= image_tag "chase-society-logo.png", alt: "Chase Society", class: "brand-logo" %>
     <% end %>
   </div>
 

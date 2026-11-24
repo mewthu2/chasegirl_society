@@ -87,6 +87,11 @@ button { font: inherit; color: inherit; cursor: pointer; }
   width: 34px; height: 34px; border-radius: 10px; display: grid; place-items: center; font-weight: 800; font-size: 18px;
   color: var(--accent-ink); background: linear-gradient(145deg, #fafafa, #9a9a9a); box-shadow: 0 6px 18px -6px var(--glow), inset 0 1px 0 rgba(255,255,255,.6);
 }
+.brand-logo { display: block; height: 46px; width: auto; filter: drop-shadow(0 4px 14px rgba(255,255,255,.12)); transition: transform .25s ease, filter .25s ease; }
+.sb-brand:hover .brand-logo { transform: translateY(-1px) scale(1.03); filter: drop-shadow(0 6px 20px rgba(255,255,255,.28)); }
+.brand-logo-lg { height: 72px; animation: brand-in .9s cubic-bezier(.2,.8,.2,1) both; }
+@keyframes brand-in { from { opacity: 0; transform: translateY(8px); filter: blur(4px); } to { opacity: 1; transform: none; filter: drop-shadow(0 4px 14px rgba(255,255,255,.12)); } }
+@media (prefers-reduced-motion: reduce) { .brand-logo, .brand-logo-lg { animation: none; transition: none; } }
 .brand-txt { display: flex; flex-direction: column; line-height: 1.05; }
 .brand-txt b { font-size: 14px; letter-spacing: .2em; font-weight: 800; }
 .brand-txt small { font-size: 10.5px; letter-spacing: .42em; color: var(--text-3); text-transform: uppercase; margin-top: 3px; }

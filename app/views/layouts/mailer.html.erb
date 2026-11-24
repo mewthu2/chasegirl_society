@@ -20,13 +20,12 @@
                 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">
                   <tr>
                     <td valign="middle">
-                      <table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>
-                        <td width="38" height="38" align="center" valign="middle" bgcolor="#f2f2f2" style="width:38px;height:38px;border-radius:10px;background:#f2f2f2;color:#0b0b0b;font-size:20px;font-weight:800;">C</td>
-                        <td style="padding-left:12px;">
-                          <div style="color:#ffffff;font-size:15px;font-weight:800;letter-spacing:4px;">CHASEGIRL</div>
-                          <div style="color:#9a9a9a;font-size:10px;letter-spacing:6px;text-transform:uppercase;">society</div>
-                        </td>
-                      </tr></table>
+                      <% logo = message.attachments["chase-society-logo.png"] %>
+                      <% if logo %>
+                        <img src="<%= logo.url %>" alt="Chase Society" width="150" height="74" style="display:block;width:150px;height:auto;border:0;">
+                      <% else %>
+                        <div style="color:#ffffff;font-size:15px;font-weight:800;letter-spacing:4px;">CHASE SOCIETY</div>
+                      <% end %>
                     </td>
                     <td align="right" valign="middle"><span style="display:inline-block;padding:5px 12px;border-radius:999px;background:#262626;color:#d6d6d6;font-size:12px;font-weight:600;"><%= yield :badge %></span></td>
                   </tr>
