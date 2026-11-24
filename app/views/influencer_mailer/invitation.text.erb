@@ -1,0 +1,7 @@
+Oi, <%= @influencer&.name.to_s.split.first %>! Você foi convidada para a Chasegirl Society.
+
+Crie sua senha e complete seu cadastro:
+<%= @url %>
+
+Seu login: <%= @user.email_address %>
+O link vale até <%= l(@expires_on, format: "%d/%m/%Y") %>.

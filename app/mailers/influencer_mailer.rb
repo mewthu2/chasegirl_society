@@ -1,10 +1,10 @@
 class InfluencerMailer < ApplicationMailer
-  # Login, senha e link de acesso para a influenciadora.
-  def access(user, password)
+  # Convite do pré-cadastro: link para ela criar a senha e completar os dados.
+  def invitation(user)
     @user = user
     @influencer = user.influencer
-    @password = password
-    @url = new_session_url
-    mail to: user.email_address, subject: "Seu acesso à Chasegirl Society"
+    @url = invitation_url(user.generate_token_for(:invitation))
+    @expires_on = User::INVITATION_TTL.from_now.to_date
+    mail to: user.email_address, subject: "Seu convite para a Chasegirl Society"
   end
 end

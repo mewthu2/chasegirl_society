@@ -231,7 +231,7 @@ table.table { width: 100%; border-collapse: collapse; font-size: 13.5px; }
 .field { display: flex; flex-direction: column; gap: 7px; }
 .field label, .label { font-size: 12.5px; font-weight: 600; color: var(--text-2); }
 .field .hint { font-size: 12px; color: var(--text-4); }
-.input, .field input[type=text], .field input[type=email], .field input[type=password], .field input[type=number], .field input[type=date], .field input[type=url], .field input[type=month], .field select, .field textarea {
+.input, .field input[type=text], .field input[type=email], .field input[type=password], .field input[type=number], .field input[type=date], .field input[type=url], .field input[type=month], .field input[type=tel], .field input[type=search], .field select, .field textarea {
   width: 100%; min-height: 40px; padding: 9px 12px; border-radius: var(--r-sm); border: 1px solid var(--border-2); background: #0d0d0d; color: var(--text); font: inherit;
   transition: border-color var(--t), box-shadow var(--t), background-color var(--t);
 }
@@ -436,3 +436,5 @@ body.auth { min-height: 100vh; }
 .approve-form { display: flex; gap: 6px; align-items: center; justify-content: flex-end; flex-wrap: wrap; }
 .approve-form input[type=text] { width: 110px; min-height: 31px; padding: 4px 10px; border-radius: var(--r-sm); border: 1px solid var(--border-2); background: #0d0d0d; color: var(--text); font: inherit; font-size: 12.5px; }
 @media (max-width: 900px) { .cycle { grid-template-columns: 1fr 1fr; } }
+
+.field input:disabled { opacity: .6; cursor: not-allowed; }

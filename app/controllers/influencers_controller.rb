@@ -53,36 +53,34 @@ class InfluencersController < ApplicationController
     redirect_to influencers_path, notice: "#{@influencer.name} foi desativada (histórico preservado)."
   end
 
+  # Pré-cadastro: a equipe informa só o e-mail; ela recebe o convite e cria a própria senha.
   def save_access
-    user = @influencer.user || @influencer.build_user(role: "influencer")
-    attrs = params.require(:access).permit(:email_address, :password)
-    attrs.delete(:password) if attrs[:password].blank? && user.persisted?
-    password_changed = attrs[:password].present?
-    user.assign_attributes(attrs.merge(name: @influencer.name, role: "influencer"))
+    email = params.require(:access).permit(:email_address)[:email_address]
+    user = User.invite(influencer: @influencer, email:)
+    email_changed = user.new_record? || user.will_save_change_to_email_address?
 
     unless user.save
-      return redirect_to @influencer, alert: "Não foi possível salvar o acesso: #{user.errors.full_messages.to_sentence}"
+      return redirect_to @influencer, alert: "Não foi possível salvar: #{user.errors.full_messages.to_sentence}"
     end
 
-    user.sessions.destroy_all if password_changed && !user.previously_new_record?
-    if params[:send_email] == "1" && password_changed
-      deliver_access(user, attrs[:password], "Acesso salvo")
+    if user.invitation_pending? && email_changed
+      deliver_invitation(user)
     else
-      redirect_to @influencer, notice: "Acesso salvo para #{user.email_address}."
+      redirect_to @influencer, notice: "E-mail de acesso atualizado para #{user.email_address}."
     end
   end
 
-  # Gera uma senha nova e manda login + senha por e-mail.
-  def send_access
-    user = @influencer.user or return redirect_to(@influencer, alert: "Crie o acesso antes de enviar.")
-    password = self.class.generate_password
-    user.update!(password:)
-    user.sessions.destroy_all
-    deliver_access(user, password, "Nova senha gerada")
-  end
-
-  def self.generate_password
-    "chase-#{SecureRandom.alphanumeric(6).downcase}"
+  def resend_invitation
+    user = @influencer.user or return redirect_to(@influencer, alert: "Cadastre o e-mail antes.")
+    if user.activated?
+      PasswordsMailer.reset(user).deliver_now
+      redirect_to @influencer, notice: "Link para redefinir a senha enviado para #{user.email_address} (vale 15 minutos)."
+    else
+      deliver_invitation(user)
+    end
+  rescue StandardError => e
+    Rails.logger.error("[InfluencerMailer] #{e.class}: #{e.message}")
+    redirect_to @influencer, alert: "Não foi possível enviar o e-mail: #{e.message}"
   end
 
   def revoke_access
@@ -99,13 +97,13 @@ class InfluencersController < ApplicationController
 
   private
 
-  def deliver_access(user, password, prefix)
-    InfluencerMailer.access(user, password).deliver_now
-    user.update_column(:access_sent_at, Time.current)
-    redirect_to @influencer, notice: "#{prefix} e enviado por e-mail para #{user.email_address}."
+  def deliver_invitation(user)
+    InfluencerMailer.invitation(user).deliver_now
+    user.update_columns(invited_at: Time.current, access_sent_at: Time.current)
+    redirect_to @influencer, notice: "Convite enviado para #{user.email_address}. Ela cria a senha pelo link (vale 7 dias)."
   rescue StandardError => e
     Rails.logger.error("[InfluencerMailer] #{e.class}: #{e.message}")
-    redirect_to @influencer, alert: "#{prefix}, mas o e-mail falhou (#{e.message}). Senha: #{password}"
+    redirect_to @influencer, alert: "Acesso salvo, mas o convite não foi enviado (#{e.message}). Tente \"Reenviar convite\"."
   end
 
   def set_influencer = @influencer = Influencer.find(params[:id])

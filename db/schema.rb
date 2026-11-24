@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_100000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_25_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -141,6 +141,8 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_100000) do
     t.string "role", default: "influencer", null: false
     t.bigint "influencer_id"
     t.datetime "access_sent_at"
+    t.datetime "invited_at"
+    t.datetime "activated_at"
     t.index ["email_address"], name: "index_users_on_email_address", unique: true
     t.index ["influencer_id"], name: "index_users_on_influencer_id", unique: true
   end

@@ -1,0 +1,25 @@
+<div class="login">
+  <%= render "sessions/brand_side" %>
+  <section class="login-form-side">
+    <div class="login-card" style="max-width:440px">
+      <div>
+        <div class="eyebrow">Pré-cadastro</div>
+        <h2>Oi, <%= @influencer&.name.to_s.split.first %>!</h2>
+        <p class="muted">Crie sua senha e confira seus dados para acessar a Chasegirl Society.</p>
+      </div>
+      <%= form_with url: invitation_path(params[:token]), method: :patch, class: "form", data: { turbo: false } do |f| %>
+        <div class="field"><label>E-mail de login</label><input type="email" value="<%= @user.email_address %>" disabled></div>
+        <% if @influencer %>
+          <%= fields_for :influencer, @influencer do |i| %>
+            <div class="field"><%= i.label :phone, "Telefone / WhatsApp" %><%= i.telephone_field :phone, placeholder: "(11) 99999-9999", autocomplete: "tel" %></div>
+            <div class="field"><%= i.label :city, "Cidade / Estado" %><%= i.text_field :city, placeholder: "São Paulo/SP" %></div>
+            <div class="field"><%= i.label :pix_key, "Chave PIX (para receber o cachê)" %><%= i.text_field :pix_key, placeholder: "CPF, e-mail, telefone ou chave aleatória" %></div>
+          <% end %>
+        <% end %>
+        <div class="field"><%= label_tag "user[password]", "Crie uma senha" %><%= password_field_tag "user[password]", nil, required: true, minlength: 6, maxlength: 72, autocomplete: "new-password", placeholder: "mínimo 6 caracteres" %></div>
+        <div class="field"><%= label_tag "user[password_confirmation]", "Repita a senha" %><%= password_field_tag "user[password_confirmation]", nil, required: true, maxlength: 72, autocomplete: "new-password" %></div>
+        <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Concluir cadastro <i class="fa-solid fa-arrow-right"></i><% end %>
+      <% end %>
+    </div>
+  </section>
+</div>

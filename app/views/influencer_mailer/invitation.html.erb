@@ -1,0 +1,27 @@
+<% content_for :preheader, "Crie sua senha e complete seu cadastro para enviar as provas dos seus stories." %>
+<% content_for :badge, "Convite" %>
+<% content_for :hero_title, "Oi, #{@influencer&.name.to_s.split.first.presence || 'tudo bem'}! Você foi convidada." %>
+
+<p style="margin:0 0 14px;">A equipe Chase criou o seu acesso à <strong>Chasegirl Society</strong>, o painel das parceiras da marca. É por lá que você envia as fotos e os links dos seus stories, posts e TikToks, acompanha as metas do mês, o pagamento e o seu cupom.</p>
+<p style="margin:0 0 4px;">Para começar, crie a sua senha e confira os seus dados:</p>
+
+<%= render "shared/mail_button", url: @url, label: "Criar minha senha" %>
+
+<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#f4f4f4;border:1px solid #dddddd;border-radius:12px;">
+  <tr><td style="padding:16px 18px;">
+    <div style="font-size:12px;color:#7a7a7a;text-transform:uppercase;letter-spacing:1px;">Seu login</div>
+    <div style="font-size:16px;font-weight:700;color:#0b0b0b;margin-top:2px;"><%= @user.email_address %></div>
+    <% if @influencer %>
+      <div style="font-size:12px;color:#7a7a7a;text-transform:uppercase;letter-spacing:1px;margin-top:14px;">Suas metas por mês</div>
+      <div style="font-size:14px;color:#1a1a1a;margin-top:2px;"><%= @influencer.channels.map { "#{@influencer.goal_for(_1)} #{Influencer.channel_label(_1)}" }.join(" · ") %></div>
+      <% if @influencer.coupon_code.present? %>
+        <div style="font-size:12px;color:#7a7a7a;text-transform:uppercase;letter-spacing:1px;margin-top:14px;">Seu cupom</div>
+        <div style="font-family:Menlo,Consolas,monospace;font-size:16px;font-weight:700;color:#0b0b0b;margin-top:2px;"><%= @influencer.coupon_code %></div>
+      <% end %>
+    <% end %>
+  </td></tr>
+</table>
+
+<p style="margin:16px 0 0;color:#6a6a6a;font-size:13px;">O link vale até <%= l(@expires_on, format: "%d/%m/%Y") %> e só pode ser usado uma vez. Se expirar, peça um novo para a equipe Chase.</p>
+
+<% content_for :why, "A equipe Chase cadastrou este e-mail como seu acesso à Chasegirl Society. Se você não esperava este convite, pode ignorar." %>
