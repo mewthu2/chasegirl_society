@@ -6,8 +6,12 @@ local:
   service: Disk
   root: <%= Rails.root.join("storage") %>
 
-# Use bin/rails credentials:edit to set the AWS secrets (as aws:access_key_id|secret_access_key)
-# amazon:
+# Fallback sem bucket: arquivos no próprio Postgres (gem active_storage_db)
+db:
+  service: DB
+
+# Produção: bucket S3 do add-on Bucketeer (ou AWS_* próprios)
+amazon:
   service: S3
   access_key_id: <%= ENV["BUCKETEER_AWS_ACCESS_KEY_ID"] || ENV["AWS_ACCESS_KEY_ID"] %>
   secret_access_key: <%= ENV["BUCKETEER_AWS_SECRET_ACCESS_KEY"] || ENV["AWS_SECRET_ACCESS_KEY"] %>
