@@ -49,7 +49,7 @@ class User < ApplicationRecord
   def role_label = ROLE_LABELS[role]
 
   # Permissões
-  def can_configure_contracts? = manager?
+  def can_configure_contracts? = staff?
   def can_review? = staff?
   def can_pay? = admin?
   def can_manage_team? = admin?

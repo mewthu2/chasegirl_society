@@ -29,10 +29,6 @@ class ApplicationController < ActionController::Base
     redirect_to root_path, alert: "Somente o perfil Admin pode acessar." unless current_user&.admin?
   end
 
-  def require_manager
-    redirect_to root_path, alert: "Somente o perfil Gerente pode configurar metas e valores." unless current_user&.can_configure_contracts?
-  end
-
   # Mês de competência vindo de ?mes=2026-11 (padrão: mês atual).
   def selected_month
     @selected_month ||= begin

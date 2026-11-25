@@ -2,9 +2,8 @@ class InfluencersController < ApplicationController
   before_action :require_staff
   before_action :set_influencer, except: %i[index new create]
 
-  # Metas, valores, cupom e vigência: só o perfil Gerente configura.
-  CONTRACT_FIELDS = %i[feed_goal stories_goal tiktok_goal cash_value permuta_value cash_is_permuta coupon_code starts_on ends_on].freeze
-  PROFILE_FIELDS = %i[name instagram tiktok city followers pix_key phone notes active].freeze
+  PERMITTED_FIELDS = %i[name instagram tiktok city followers pix_key phone notes active
+                        feed_goal stories_goal tiktok_goal cash_value permuta_value cash_is_permuta coupon_code starts_on ends_on].freeze
 
   def index
     scope = Influencer.ordered.includes(:user)
@@ -23,20 +22,15 @@ class InfluencersController < ApplicationController
     @statements = @influencer.monthly_statements.order(month: :desc)
   end
 
-  # Qualquer pessoa da equipe cadastra; metas, valores e cupom só o Gerente preenche.
   def new
-    @influencer = Influencer.new
-    return unless current_user.can_configure_contracts?
-    @influencer.assign_attributes(feed_goal: 1, stories_goal: 4, tiktok_goal: 1, cash_value: 1000, permuta_value: 1500,
-                                  starts_on: Date.current, ends_on: 3.months.from_now.to_date)
+    @influencer = Influencer.new(feed_goal: 1, stories_goal: 4, tiktok_goal: 1, cash_value: 1000, permuta_value: 1500,
+                                 starts_on: Date.current, ends_on: 3.months.from_now.to_date)
   end
 
   def create
     @influencer = Influencer.new(influencer_params)
     if @influencer.save
-      notice = "Influenciadora cadastrada. Agora crie o acesso dela."
-      notice += " Metas, valores e cupom ficam para o Gerente configurar." unless current_user.can_configure_contracts?
-      redirect_to @influencer, notice:
+      redirect_to @influencer, notice: "Influenciadora cadastrada. Agora crie o acesso dela."
     else
       render :new, status: :unprocessable_entity
     end
@@ -118,8 +112,5 @@ class InfluencersController < ApplicationController
 
   def set_influencer = @influencer = Influencer.find(params[:id])
 
-  def influencer_params
-    allowed = PROFILE_FIELDS + (current_user.can_configure_contracts? ? CONTRACT_FIELDS : [])
-    params.require(:influencer).permit(*allowed)
-  end
+  def influencer_params = params.require(:influencer).permit(*PERMITTED_FIELDS)
 end
