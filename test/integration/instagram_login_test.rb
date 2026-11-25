@@ -24,7 +24,7 @@ class InstagramLoginTest < ActionDispatch::IntegrationTest
     assert_not user.activated?
 
     post session_path, params: { login: "anamflima", password: "segredo1" }
-    assert_redirected_to new_session_path(perfil: "influencer", login: "anamflima")
+    assert_redirected_to new_session_path(login: "anamflima")
     assert_match "confirmar seu e-mail", flash[:alert]
 
     get first_access_confirm_path(user.generate_token_for(:email_confirmation))
@@ -50,7 +50,7 @@ class InstagramLoginTest < ActionDispatch::IntegrationTest
   test "quem já tem acesso é mandada para o login" do
     first_access!.update!(activated_at: Time.current)
     post first_access_path, params: { instagram: "anamflima" }
-    assert_redirected_to new_session_path(perfil: "influencer", login: "anamflima")
+    assert_redirected_to new_session_path(login: "anamflima")
   end
 
   test "refazer o primeiro acesso com outro e-mail invalida o link antigo" do
@@ -58,7 +58,7 @@ class InstagramLoginTest < ActionDispatch::IntegrationTest
     old_token = user.generate_token_for(:email_confirmation)
     first_access!(email: "certo@email.test")
     get first_access_confirm_path(old_token)
-    assert_redirected_to new_session_path(perfil: "influencer")
+    assert_redirected_to new_session_path
     assert_not user.reload.activated?
   end
 

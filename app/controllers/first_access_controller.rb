@@ -13,7 +13,7 @@ class FirstAccessController < ApplicationController
     return redirect_to(first_access_path(instagram: params[:instagram]), alert: "Não encontramos o @#{params[:instagram].to_s.delete_prefix('@')}. Confira o @ ou fale com a equipe Chase.") unless @influencer
 
     if @influencer.user&.activated?
-      return redirect_to new_session_path(perfil: "influencer", login: @influencer.instagram),
+      return redirect_to new_session_path(login: @influencer.instagram),
                          notice: "Você já tem acesso. Entre com o seu @ e a senha."
     end
     @email = @influencer.user&.email_address
@@ -23,7 +23,7 @@ class FirstAccessController < ApplicationController
   def create
     @influencer = Influencer.active.find_by_handle(params[:instagram])
     return redirect_to(first_access_path, alert: "Cadastro não encontrado.") unless @influencer
-    return redirect_to(new_session_path(perfil: "influencer"), notice: "Você já tem acesso. Entre com o seu @ e a senha.") if @influencer.user&.activated?
+    return redirect_to(new_session_path, notice: "Você já tem acesso. Entre com o seu @ e a senha.") if @influencer.user&.activated?
 
     @email = params[:email_address].to_s.strip.downcase
     user = @influencer.user || @influencer.build_user(role: "influencer")
@@ -50,7 +50,7 @@ class FirstAccessController < ApplicationController
   def confirm
     user = User.find_by_token_for(:email_confirmation, params[:token])
     unless user
-      return redirect_to new_session_path(perfil: "influencer"), alert: "Link inválido ou expirado. Faça o primeiro acesso de novo."
+      return redirect_to new_session_path, alert: "Link inválido ou expirado. Faça o primeiro acesso de novo."
     end
 
     return redirect_to(new_session_path, alert: ApplicationController::BLOCKED_MESSAGE) if user.access_blocked?

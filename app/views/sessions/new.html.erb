@@ -1,55 +1,30 @@
-<% tab = params[:perfil] == "equipe" ? "equipe" : "influencer" %>
 <div class="login">
   <%= render "sessions/brand_side" %>
 
   <section class="login-form-side">
-    <div class="login-card" data-controller="tabs">
+    <div class="login-card">
       <div>
         <div class="eyebrow">Acesso</div>
         <h2>Entrar</h2>
       </div>
 
-      <div class="login-tabs" role="tablist">
-        <button type="button" role="tab" data-tabs-target="tab" data-tab="influencer" data-action="tabs#select" aria-selected="<%= tab == 'influencer' %>"><%= icon("camera-retro") %>Sou influencer</button>
-        <button type="button" role="tab" data-tabs-target="tab" data-tab="equipe" data-action="tabs#select" aria-selected="<%= tab == 'equipe' %>"><%= icon("user-shield") %>Sou da equipe</button>
-      </div>
-
-      <div data-tabs-target="panel" data-tab="influencer" <%= "hidden" unless tab == "influencer" %>>
-        <%= form_with url: session_path, class: "form", data: { turbo: false } do |f| %>
-          <%= hidden_field_tag :perfil, "influencer" %>
-          <div class="field">
-            <%= label_tag "login_influencer", "@ do Instagram ou e-mail" %>
-            <%= text_field_tag :login, (params[:login] if tab == "influencer"), id: "login_influencer", required: true, autofocus: tab == "influencer",
-                  autocomplete: "username", autocapitalize: "none", spellcheck: false, placeholder: "@seuinstagram" %>
-          </div>
-          <div class="field">
-            <%= label_tag "password_influencer", "Senha" %>
-            <%= password_field_tag :password, nil, id: "password_influencer", required: true, autocomplete: "current-password", maxlength: 72, placeholder: "••••••••" %>
-          </div>
-          <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
-        <% end %>
-        <div class="first-access">
-          <div><b>Primeira vez aqui?</b><small>A equipe Chase já cadastrou o seu @. Crie seu acesso em 1 minuto.</small></div>
-          <%= link_to "Primeiro acesso", first_access_path, class: "btn btn-secondary btn-sm" %>
+      <%= form_with url: session_path, class: "form", data: { turbo: false } do |f| %>
+        <div class="field">
+          <%= label_tag :login, "Usuário (@ do Instagram) ou e-mail" %>
+          <%= text_field_tag :login, params[:login], required: true, autofocus: true,
+                autocomplete: "username", autocapitalize: "none", spellcheck: false, placeholder: "@seuinstagram ou voce@email.com" %>
         </div>
-        <p class="muted small" style="margin-top:14px"><%= link_to "Esqueci minha senha", new_password_path %></p>
+        <div class="field">
+          <%= label_tag :password, "Senha" %>
+          <%= password_field_tag :password, nil, required: true, autocomplete: "current-password", maxlength: 72, placeholder: "••••••••" %>
+        </div>
+        <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
+      <% end %>
+      <div class="first-access">
+        <div><b>Primeira vez aqui?</b><small>A equipe Chase já cadastrou o seu @. Crie seu acesso em 1 minuto.</small></div>
+        <%= link_to "Primeiro acesso", first_access_path, class: "btn btn-secondary btn-sm" %>
       </div>
-
-      <div data-tabs-target="panel" data-tab="equipe" <%= "hidden" unless tab == "equipe" %>>
-        <%= form_with url: session_path, class: "form", data: { turbo: false } do |f| %>
-          <%= hidden_field_tag :perfil, "equipe" %>
-          <div class="field">
-            <%= label_tag "login_equipe", "E-mail" %>
-            <%= email_field_tag :login, (params[:login] if tab == "equipe"), id: "login_equipe", required: true, autofocus: tab == "equipe", autocomplete: "username", placeholder: "voce@chasebrasil.com" %>
-          </div>
-          <div class="field">
-            <%= label_tag "password_equipe", "Senha" %>
-            <%= password_field_tag :password, nil, id: "password_equipe", required: true, autocomplete: "current-password", maxlength: 72, placeholder: "••••••••" %>
-          </div>
-          <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
-        <% end %>
-        <p class="muted small" style="margin-top:14px"><%= link_to "Esqueci minha senha", new_password_path %></p>
-      </div>
+      <p class="muted small" style="margin-top:14px"><%= link_to "Esqueci minha senha", new_password_path %></p>
     </div>
   </section>
 </div>

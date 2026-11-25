@@ -9,7 +9,7 @@
         <p class="muted">Enviamos um link para <b><%= @sent_to %></b>. Abra o e-mail e toque em <b>Confirmar e entrar</b> para ativar o seu acesso.</p>
       </div>
       <div class="callout"><%= icon("circle-info") %><span>Não chegou? Olhe a caixa de spam e a aba Promoções. Se o e-mail estiver errado, <%= link_to "faça o primeiro acesso de novo", first_access_path(instagram: @influencer.instagram) %>.</span></div>
-      <%= link_to "Ir para o login", new_session_path(perfil: "influencer", login: @influencer.instagram), class: "btn btn-secondary btn-block" %>
+      <%= link_to "Ir para o login", new_session_path(login: @influencer.instagram), class: "btn btn-secondary btn-block" %>
     </div>
   </section>
 </div>

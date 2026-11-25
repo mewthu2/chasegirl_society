@@ -8,10 +8,9 @@ class SessionsController < ApplicationController
     redirect_to root_path if authenticated?
   end
 
-  # Influenciadora entra com e-mail ou @ do Instagram; equipe com e-mail.
+  # Um login só: e-mail ou usuário (@ do Instagram da influenciadora).
   def create
     user = User.find_by_login(params[:login])
-    tab = params[:perfil].presence_in(%w[influencer equipe]) || "influencer"
 
     if user&.authenticate(params[:password].to_s)
       if user.access_blocked?
@@ -20,12 +19,12 @@ class SessionsController < ApplicationController
         start_new_session_for user
         redirect_to after_authentication_url
       else
-        redirect_to new_session_path(perfil: tab, login: params[:login]),
+        redirect_to new_session_path(login: params[:login]),
                     alert: "Falta confirmar seu e-mail: clique no link que enviamos para #{helpers.mask_email(user.email_address)}."
       end
     else
-      redirect_to new_session_path(perfil: tab, login: params[:login]),
-                  alert: tab == "influencer" ? "Login ou senha incorretos. Primeira vez aqui? Use \"Primeiro acesso\"." : "E-mail ou senha incorretos."
+      redirect_to new_session_path(login: params[:login]),
+                  alert: "Usuário/e-mail ou senha incorretos. Primeira vez aqui? Use \"Primeiro acesso\"."
     end
   end
 
