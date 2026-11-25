@@ -19,7 +19,7 @@ Rails.application.routes.draw do
       post :access, to: "influencers#save_access"
       delete :access, to: "influencers#revoke_access"
       post :resend_invitation
-      get :coupon
+      post :coupon
       post :reactivate
     end
   end

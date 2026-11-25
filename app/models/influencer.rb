@@ -75,6 +75,24 @@ class Influencer < ApplicationRecord
 
   def reset_channel_cache! = @channel_values = nil
 
+  # Cupom padrão: CG + @ do Instagram (ex.: @palomaleuze → CGPALOMALEUZE).
+  def default_coupon_code = instagram.present? ? "CG#{instagram.upcase}" : nil
+
+  # Garante o cupom na Shopify: se ainda não tem código, usa o padrão; cria com 1 uso no valor
+  # da permuta (se já existir lá, não mexe). Falha na Shopify não impede o cadastro: fica no log.
+  # => :created | :exists | nil
+  def ensure_coupon!
+    if coupon_code.blank?
+      code = default_coupon_code
+      return nil if code.blank? || self.class.where.not(id:).exists?(coupon_code: code)
+      update!(coupon_code: code)
+    end
+    ShopifyCoupon.new(coupon_code).create!(amount: permuta_value)
+  rescue ShopifyCoupon::Error => e
+    Rails.logger.error("[Cupom] #{name} (#{coupon_code}): #{e.message}")
+    nil
+  end
+
   # Desligar: perde o acesso à área dela na hora; metas, comprovações e histórico ficam guardados.
   def deactivate! = update!(active: false)
   def reactivate! = update!(active: true)

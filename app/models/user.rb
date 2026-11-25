@@ -40,6 +40,9 @@ class User < ApplicationRecord
 
   scope :staff, -> { where(role: STAFF_ROLES) }
 
+  # Concluiu o cadastro (convite, primeiro acesso pelo @ ou primeira senha): gera o cupom dela.
+  after_commit :create_influencer_coupon, on: %i[create update], if: -> { influencer? && saved_change_to_activated_at?(from: nil) }
+
   def admin? = role == "admin"
   def manager? = role == "manager"
   def staff? = STAFF_ROLES.include?(role)
@@ -80,5 +83,11 @@ class User < ApplicationRecord
 
   def initials
     display_name.split(/[\s@.]+/).reject(&:blank?).first(2).map { _1[0] }.join.upcase
+  end
+
+  private
+
+  def create_influencer_coupon
+    influencer&.ensure_coupon!
   end
 end

@@ -59,4 +59,35 @@ class CouponCreationTest < ActionDispatch::IntegrationTest
     inf.update!(active: false)
     assert_not inf.active_in?(Date.new(2026, 12, 1))
   end
+
+  test "ao concluir o cadastro gera o cupom CG + @ com 1 uso" do
+    inf = Influencer.create!(name: "Paula", instagram: "@paula.gaspar", feed_goal: 1, stories_goal: 0, tiktok_goal: 0, cash_value: 1000, permuta_value: 1800)
+    user = inf.create_user!(email_address: "paula@x.test", password: "password", role: "influencer")
+    with_fake_shopify do |calls, codes|
+      user.update!(name: "Paula G.") # ainda não concluiu
+      assert_empty calls
+      user.update!(activated_at: Time.current)
+      assert_equal ["CGPAULA.GASPAR"], codes
+      assert_equal [{ amount: 1800.to_d, usage_limit: 1 }], calls
+      user.update!(activated_at: Time.current) # já ativa: não cria de novo
+      assert_equal 1, calls.size
+    end
+    assert_equal "CGPAULA.GASPAR", inf.reload.coupon_code
+  end
+
+  test "ao concluir o cadastro mantém o cupom já informado pela equipe" do
+    inf = Influencer.create!(name: "Ana", instagram: "ana", feed_goal: 1, stories_goal: 0, tiktok_goal: 0, cash_value: 1000, coupon_code: "CGANA01")
+    user = inf.create_user!(email_address: "ana@x.test", password: "password", role: "influencer")
+    with_fake_shopify(result: :exists) do |_, codes|
+      user.update!(activated_at: Time.current)
+      assert_equal ["CGANA01"], codes
+    end
+  end
+
+  test "falha na Shopify não impede concluir o cadastro" do
+    inf = Influencer.create!(name: "Ana", instagram: "ana", feed_goal: 1, stories_goal: 0, tiktok_goal: 0, cash_value: 1000)
+    user = inf.create_user!(email_address: "ana@x.test", password: "password", role: "influencer")
+    with_fake_shopify(error: "fora do ar") { user.update!(activated_at: Time.current) }
+    assert user.reload.activated?
+  end
 end

@@ -92,9 +92,16 @@ class InfluencersController < ApplicationController
     redirect_to @influencer, notice: "Acesso removido."
   end
 
+  # Consulta o cupom na Shopify; se ainda não existe lá (ex.: falhou ao concluir o cadastro), cria com 1 uso.
   def coupon
+    if @influencer.coupon_code.blank?
+      return redirect_to(@influencer, alert: "Sem cupom: cadastre o @ do Instagram ou o código do cupom.") unless @influencer.default_coupon_code
+      @influencer.update!(coupon_code: @influencer.default_coupon_code)
+    end
+    created = ShopifyCoupon.new(@influencer.coupon_code).create!(amount: @influencer.permuta_value) == :created
     @coupon = ShopifyCoupon.new(@influencer.coupon_code).lookup
-    redirect_to @influencer, notice: "Cupom #{@influencer.coupon_code}: limite de usos #{@coupon[:usage_limit] || 'ilimitado'} · usado #{@coupon[:used]} vez(es) · #{@coupon[:status]}"
+    redirect_to @influencer, notice: "#{'Cupom criado agora na Shopify. ' if created}"\
+                                     "Cupom #{@influencer.coupon_code}: limite de usos #{@coupon[:usage_limit] || 'ilimitado'} · usado #{@coupon[:used]} vez(es) · #{@coupon[:status]}"
   rescue ShopifyCoupon::Error => e
     redirect_to @influencer, alert: e.message
   end
