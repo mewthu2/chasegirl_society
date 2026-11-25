@@ -73,4 +73,21 @@ class PermissionsTest < ActionDispatch::IntegrationTest
       assert_redirected_to portal_path, path
     end
   end
+
+  test "equipe filtra comprovações por influenciadora" do
+    bia = Influencer.create!(name: "Bia", feed_goal: 1, cash_value: 500)
+    Proof.create!(influencer: @inf, kind: "feed", link: "instagram.com/p/ana", submitted_by: users(:admin))
+    Proof.create!(influencer: bia, kind: "feed", link: "instagram.com/p/bia", submitted_by: users(:admin))
+    login users(:manager)
+
+    get proofs_path(status: "todas")
+    assert_select ".proof-cards > *", 2
+    assert_select "select[name=influencer_id] option", text: "Bia"
+
+    get proofs_path(status: "todas", influencer_id: bia.id)
+    assert_select ".proof-cards > *", 1
+    assert_select "select[name=influencer_id] option[selected]", text: "Bia"
+    assert_select "form input[type=hidden][name=status][value=todas]"
+    assert_select ".seg a.is-active .count", text: "1"
+  end
 end

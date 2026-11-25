@@ -10,7 +10,10 @@ class ProofsController < ApplicationController
     scope = scope.for_month(selected_month) if params[:mes].present?
     scope = scope.where(influencer_id: params[:influencer_id]) if staff? && params[:influencer_id].present?
     @proofs = scope.includes(:influencer, :reviewed_by, images_attachments: :blob).recent.limit(200)
-    @counts = (staff? ? Proof.all : current_user.influencer.proofs).group(:status).count
+    counts = staff? ? Proof.all : current_user.influencer.proofs
+    counts = counts.where(influencer_id: params[:influencer_id]) if staff? && params[:influencer_id].present?
+    @counts = counts.group(:status).count
+    @influencer_options = Influencer.order(:name).pluck(:name, :id) if staff?
   end
 
   def show; end

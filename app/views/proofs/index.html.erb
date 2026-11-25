@@ -22,8 +22,13 @@
       <%= link_to "Todos os canais", proofs_path(request.query_parameters.except(:kind)), class: ("is-active" if params[:kind].blank?) %>
       <% Influencer::CHANNELS.each do |k| %><%= link_to Influencer.channel_label(k), proofs_path(request.query_parameters.merge(kind: k)), class: ("is-active" if params[:kind] == k) %><% end %>
     </div>
-    <% if params[:influencer_id].present? && (inf = Influencer.find_by(id: params[:influencer_id])) %>
-      <%= link_to proofs_path(request.query_parameters.except(:influencer_id)), class: "tag" do %><%= inf.name %> <%= icon("xmark") %><% end %>
+    <% if staff? %>
+      <%= form_with url: proofs_path, method: :get, class: "toolbar-filter", data: { controller: "autosubmit" } do %>
+        <% request.query_parameters.except("influencer_id").each do |k, v| %><%= hidden_field_tag k, v %><% end %>
+        <%= icon("user") %>
+        <%= select_tag :influencer_id, options_for_select(@influencer_options, params[:influencer_id]), include_blank: "Todas as influenciadoras", class: "input", "aria-label": "Filtrar por influenciadora", data: { action: "change->autosubmit#submit" } %>
+        <noscript><button class="btn btn-secondary btn-sm">Filtrar</button></noscript>
+      <% end %>
     <% end %>
   </div>
 </div>

@@ -515,3 +515,8 @@ a.quick-action-primary:hover .qa-go { color: #000; }
   .cycle-step b { font-size: 12px; }
   .cycle-step small { font-size: 10.5px; line-height: 1.35; display: block; }
 }
+
+/* Filtro por influenciadora (Comprovações) */
+.toolbar-filter { display: flex; align-items: center; gap: 8px; margin-left: auto; color: var(--text-3); }
+.toolbar-filter select.input { width: auto; height: 36px; min-height: 36px; min-width: 220px; padding: 0 10px; }
+@media (max-width: 900px) { .toolbar-filter { margin-left: 0; width: 100%; } .toolbar-filter select.input { flex: 1; min-width: 0; } }
