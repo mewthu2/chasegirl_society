@@ -11,11 +11,16 @@
     </div>
     <div class="card-body form-grid">
       <% months = (Proof.month_options(proof.influencer) | [proof.month&.beginning_of_month].compact).sort %>
-      <div class="field span-12">
-        <%= f.label :month, "Mês de referência *" %>
-        <%= f.select :month, months.map { |m| [month_label(m), m.to_s] }, { selected: (proof.month || months.last)&.to_s } %>
-        <span class="hint">A entrega conta para a meta deste mês</span>
-      </div>
+      <% if months.empty? %>
+        <div class="span-12 callout"><%= icon("circle-check") %><span>As metas de <%= month_label(Date.current) %> já foram cumpridas. O próximo envio é o de <%= month_label(Date.current.next_month) %>, a partir de <%= date_br(Date.current.next_month.beginning_of_month) %>.</span></div>
+      <% else %>
+        <div class="field span-12">
+          <%= f.label :month, "Mês de referência" %>
+          <%= f.hidden_field :month, value: (proof.month || months.last).to_s %>
+          <div><b><%= month_label(proof.month || months.last) %></b></div>
+          <span class="hint">Só dá para enviar conteúdo do mês atual</span>
+        </div>
+      <% end %>
       <% if staff? && proof.new_record? %>
         <% if proof.influencer %>
           <%= f.hidden_field :influencer_id %>

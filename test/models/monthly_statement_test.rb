@@ -6,6 +6,7 @@ class MonthlyStatementTest < ActiveSupport::TestCase
                               cash_value: 1000, coupon_code: "CGANA")
     @month = Date.new(2026, 10, 1)
     @admin = users(:admin)
+    travel_to Date.new(2026, 10, 15) # comprovações só do mês atual
   end
 
   def with_fake_coupon(fake)
@@ -23,7 +24,7 @@ class MonthlyStatementTest < ActiveSupport::TestCase
   end
 
   def proof(kind)
-    @inf.proofs.create!(kind:, posted_on: @month + 3, link: "https://instagram.com/p/x",
+    @inf.proofs.create!(kind:, month: @month, link: "https://instagram.com/p/x",
                         images: [fixture_file_upload("story.png", "image/png")])
   end
 

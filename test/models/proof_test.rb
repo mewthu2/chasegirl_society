@@ -28,15 +28,17 @@ class ProofTest < ActiveSupport::TestCase
     assert_not @inf.proofs.new(kind: "tiktok", images: [photo]).valid?
   end
 
-  test "envio por mês: aceita o anterior, recusa futuro e mês já aprovado" do
+  test "envio só do mês atual; cumprido o mês, só no mês seguinte" do
     current = Date.current.beginning_of_month
-    proof = @inf.proofs.create!(kind: "feed", link: "https://instagram.com/p/x", month: current.prev_month)
-    assert_equal current.prev_month, proof.month
-    assert_not @inf.proofs.new(kind: "feed", link: "https://instagram.com/p/x", month: current.next_month).valid?
-
-    @inf.statement_for(current.prev_month).update_columns(review_status: "approved")
+    proof = @inf.proofs.create!(kind: "feed", link: "https://instagram.com/p/x", month: current)
+    assert_equal current, proof.month
     assert_not @inf.proofs.new(kind: "feed", link: "https://instagram.com/p/x", month: current.prev_month).valid?
+    assert_not @inf.proofs.new(kind: "feed", link: "https://instagram.com/p/x", month: current.next_month).valid?
     assert_equal [current], Proof.month_options(@inf)
+
+    @inf.statement_for(current).update_columns(review_status: "approved")
+    assert_not @inf.proofs.new(kind: "feed", link: "https://instagram.com/p/x", month: current).valid?
+    assert_empty Proof.month_options(@inf)
   end
 
   test "stories: cada print conta como uma entrega" do

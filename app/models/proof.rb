@@ -39,10 +39,11 @@ class Proof < ApplicationRecord
   def needs_photo? = PHOTO_KINDS.include?(kind)
   def deliveries_label = "#{quantity} #{quantity == 1 ? 'entrega' : 'entregas'}"
 
-  # Meses em que dá para enviar: o atual e o anterior (enquanto não foi aprovado na conferência).
+  # Só dá para enviar conteúdo do mês atual, e só enquanto ele não estiver cumprido/aprovado.
+  # Ex.: cumpriu novembro no dia 25 → o próximo envio é o de dezembro, a partir de 1º de dezembro.
   def self.month_options(influencer, today: Date.current)
     current = today.beginning_of_month
-    [current.prev_month, current].reject { |m| influencer && month_closed?(influencer, m) }
+    influencer && month_closed?(influencer, current) ? [] : [current]
   end
 
   def self.month_closed?(influencer, month)
@@ -95,10 +96,10 @@ class Proof < ApplicationRecord
 
   def month_open
     return unless influencer && month
-    if month > Date.current.beginning_of_month
-      errors.add(:base, "O mês de referência não pode ser um mês futuro")
+    if month != Date.current.beginning_of_month
+      errors.add(:base, "Só dá para enviar conteúdo do mês atual")
     elsif self.class.month_closed?(influencer, month)
-      errors.add(:base, "Esse mês já foi aprovado na conferência; escolha outro mês")
+      errors.add(:base, "As metas deste mês já foram cumpridas; o próximo envio é a partir de #{I18n.l(month.next_month)}")
     end
   end
 

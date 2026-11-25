@@ -15,16 +15,25 @@ class ProofSubmissionTest < ActionDispatch::IntegrationTest
     assert_select "#comprovar", 0
   end
 
-  test "envia comprovação de feed só com link para o mês anterior" do
-    prev = Date.current.beginning_of_month.prev_month
+  test "envia comprovação de feed só com link, sempre para o mês atual" do
+    current = Date.current.beginning_of_month
     get new_proof_path
     assert_response :success
-    assert_select "select[name='proof[month]'] option", 2
+    assert_select "input[type=hidden][name='proof[month]'][value='#{current}']"
 
-    post proofs_path, params: { proof: { kind: "feed", month: prev.to_s, link: "instagram.com/p/abc" } }
-    proof = @inf.proofs.last
-    assert_equal prev, proof.month
-    assert_redirected_to portal_path(mes: prev.strftime("%Y-%m"))
+    post proofs_path, params: { proof: { kind: "feed", month: current.prev_month.to_s, link: "instagram.com/p/abc" } }
+    assert_response :unprocessable_entity
+
+    post proofs_path, params: { proof: { kind: "feed", month: current.to_s, link: "instagram.com/p/abc" } }
+    assert_equal current, @inf.proofs.last.month
+    assert_redirected_to portal_path(mes: current.strftime("%Y-%m"))
+  end
+
+  test "mês já cumprido: tela avisa que o próximo envio é no mês seguinte" do
+    @inf.statement_for(Date.current).update_columns(review_status: "approved")
+    get new_proof_path
+    assert_select ".callout", text: /já foram cumpridas/
+    assert_select "input[name='proof[month]']", 0
   end
 
   test "stories sem print não vai" do
