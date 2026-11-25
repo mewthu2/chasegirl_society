@@ -1,6 +1,5 @@
 class InfluencersController < ApplicationController
   before_action :require_staff
-  before_action :require_manager, only: %i[new create]
   before_action :set_influencer, except: %i[index new create]
 
   # Metas, valores, cupom e vigência: só o perfil Gerente configura.
@@ -24,15 +23,20 @@ class InfluencersController < ApplicationController
     @statements = @influencer.monthly_statements.order(month: :desc)
   end
 
+  # Qualquer pessoa da equipe cadastra; metas, valores e cupom só o Gerente preenche.
   def new
-    @influencer = Influencer.new(feed_goal: 1, stories_goal: 4, tiktok_goal: 1, cash_value: 1000, permuta_value: 1500,
-                                 starts_on: Date.current, ends_on: 3.months.from_now.to_date)
+    @influencer = Influencer.new
+    return unless current_user.can_configure_contracts?
+    @influencer.assign_attributes(feed_goal: 1, stories_goal: 4, tiktok_goal: 1, cash_value: 1000, permuta_value: 1500,
+                                  starts_on: Date.current, ends_on: 3.months.from_now.to_date)
   end
 
   def create
     @influencer = Influencer.new(influencer_params)
     if @influencer.save
-      redirect_to @influencer, notice: "Influenciadora cadastrada. Agora crie o acesso dela."
+      notice = "Influenciadora cadastrada. Agora crie o acesso dela."
+      notice += " Metas, valores e cupom ficam para o Gerente configurar." unless current_user.can_configure_contracts?
+      redirect_to @influencer, notice:
     else
       render :new, status: :unprocessable_entity
     end

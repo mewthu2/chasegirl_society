@@ -7,7 +7,7 @@
     <p class="lead">Cadastro, metas por canal, cachê e acesso de cada parceira.</p>
   </div>
   <div class="actions">
-    <% if current_user.can_configure_contracts? %><%= link_to new_influencer_path, class: "btn btn-primary" do %><%= icon("plus") %>Nova influenciadora<% end %><% end %>
+    <%= link_to new_influencer_path, class: "btn btn-primary" do %><%= icon("plus") %>Nova influenciadora<% end %>
   </div>
 </div>
 

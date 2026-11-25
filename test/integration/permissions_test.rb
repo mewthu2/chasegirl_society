@@ -20,8 +20,28 @@ class PermissionsTest < ActionDispatch::IntegrationTest
     patch influencer_path(@inf), params: { influencer: { stories_goal: 6, cash_value: 1200, city: "BH" } }
     @inf.reload
     assert_equal [4, 1000.to_d, "BH"], [@inf.stories_goal, @inf.cash_value, @inf.city]
+  end
+
+  test "admin cadastra nova influenciadora, mas metas e valores ficam com o Gerente" do
+    login users(:admin)
+    get influencers_path
+    assert_select "a[href=?]", new_influencer_path
     get new_influencer_path
-    assert_redirected_to root_path
+    assert_response :success
+    assert_difference "Influencer.count", 1 do
+      post influencers_path, params: { influencer: { name: "Bia", instagram: "@bia.chase", city: "SP", cash_value: 5000, coupon_code: "CGBIA" } }
+    end
+    bia = Influencer.order(:id).last
+    assert_redirected_to influencer_path(bia)
+    assert_equal ["bia.chase", "SP", 0.to_d, nil], [bia.instagram, bia.city, bia.cash_value, bia.coupon_code]
+  end
+
+  test "gerente cadastra nova influenciadora com contrato" do
+    login users(:manager)
+    assert_difference "Influencer.count", 1 do
+      post influencers_path, params: { influencer: { name: "Carol", instagram: "carol", cash_value: 1200, coupon_code: "cgcarol" } }
+    end
+    assert_equal [1200.to_d, "CGCAROL"], Influencer.order(:id).last.then { [_1.cash_value, _1.coupon_code] }
   end
 
   test "gerente vê o a pagar mas não os pagos nem registra pagamento" do

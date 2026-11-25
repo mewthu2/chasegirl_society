@@ -15,6 +15,9 @@
   <% can_contract = current_user.can_configure_contracts? %>
   <div class="card">
     <div class="card-head"><h2>Contrato mensal</h2><% unless can_contract %><span class="chip chip-none" style="margin-left:auto"><%= icon("lock") %>Só o Gerente altera</span><% end %></div>
+    <% if influencer.new_record? && !can_contract %>
+    <div class="card-body"><div class="callout"><%= icon("lock") %><span>Metas, cachê, permuta, cupom e vigência são definidos pelo Gerente depois do cadastro, na ficha da influenciadora.</span></div></div>
+    <% else %>
     <fieldset class="card-body form-grid" style="border:0;margin:0;min-width:0" <%= "disabled" unless can_contract %>>
       <div class="field span-4"><%= f.label :feed_goal, "Meta Feed/Reels por mês" %><%= f.number_field :feed_goal, min: 0 %></div>
       <div class="field span-4"><%= f.label :stories_goal, "Meta Stories (telas) por mês" %><%= f.number_field :stories_goal, min: 0 %></div>
@@ -27,6 +30,7 @@
       <div class="field span-4"><%= f.label :starts_on, "Início" %><%= f.date_field :starts_on %></div>
       <div class="field span-4"><%= f.label :ends_on, "Fim" %><%= f.date_field :ends_on %></div>
     </fieldset>
+    <% end %>
   </div>
 
   <div class="card">
