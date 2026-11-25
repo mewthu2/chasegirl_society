@@ -1,8 +1,9 @@
 # Fechamento mensal de uma influenciadora.
 #
 # Ciclo: as entregas são do mês M. De 1 a 10 do mês M+1 a equipe faz a conferência;
-# o pagamento é no dia 10. Aprovar o mês renova o cupom (+1 uso na Shopify) e cria o
-# "a pagar" do combinado, com vencimento no dia 10.
+# o pagamento é no dia 10. O mês é aprovado sozinho assim que as metas são cumpridas
+# (comprovações aprovadas): renova o cupom (+1 uso na Shopify) e cria o "a pagar" do
+# combinado, com vencimento no dia 10.
 class MonthlyStatement < ApplicationRecord
   REVIEW_DAYS = 10
   REVIEW_LABELS = { "open" => "Aguardando conferência", "approved" => "Aprovado", "rejected" => "Reprovado" }.freeze
@@ -30,14 +31,6 @@ class MonthlyStatement < ApplicationRecord
 
   # Mês que está (ou acabou de estar) em conferência: sempre o mês anterior ao atual.
   def self.review_month(today = Date.current) = today.beginning_of_month.prev_month
-
-  # Influenciadoras ativas no mês que ainda não foram aprovadas nem reprovadas.
-  def self.awaiting_review_count(month)
-    month = month.to_date.beginning_of_month
-    active_ids = Influencer.active.select { _1.active_in?(month) }.map(&:id)
-    decided = for_month(month).where.not(review_status: "open").pluck(:influencer_id)
-    (active_ids - decided).size
-  end
 
   def self.phase(month, today = Date.current)
     month = month.to_date.beginning_of_month
@@ -101,6 +94,13 @@ class MonthlyStatement < ApplicationRecord
     update!(review_status: "approved", reviewed_by: by, reviewed_at: Time.current, review_note: note.presence,
             amount_payable: amount.nil? ? amount_due : amount.to_d, due_on: due_date, payment_status: "open")
     increment_coupon! if renew_coupon
+  end
+
+  # Chamado ao aprovar uma comprovação: se ela fechou todas as metas do mês, aprova o mês.
+  def auto_approve!(by:)
+    return false unless review_open? && !paid? && goal_met?
+    approve!(by:, note: "Aprovado automaticamente: metas cumpridas")
+    true
   end
 
   def reject!(by:, note: nil)

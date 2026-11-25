@@ -64,10 +64,8 @@ class Influencer < ApplicationRecord
 
   def active_in?(month)
     month = month.to_date.beginning_of_month
-    return false unless active?
-    return false if starts_on && starts_on > month.end_of_month
-    return false if ends_on && ends_on < month
-    true
+    # Sem vigência: a meta é por mês, enquanto a parceria estiver ativa (a partir do mês do cadastro).
+    active? && (created_at.nil? || created_at.to_date.beginning_of_month <= month)
   end
 
   def instagram_url = instagram && "https://instagram.com/#{instagram}"

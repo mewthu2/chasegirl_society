@@ -15,11 +15,11 @@
 <div style="margin-top:16px"><%= render "shared/channels", statement: s %></div>
 
 <div class="card" style="margin-top:18px">
-  <div class="card-head"><h2>Decisão do mês</h2><span class="muted small" style="margin-left:auto">Sugestão pelos canais cumpridos: <b><%= brl(s.amount_due) %></b></span></div>
+  <div class="card-head"><h2>Situação do mês</h2></div>
   <div class="card-body">
-    <% if s.pending_total.positive? %><div class="callout" style="margin-bottom:14px"><%= icon("hourglass-half") %><span><%= s.pending_total %> entrega(s) ainda em análise neste mês. Confira as comprovações abaixo antes de decidir.</span></div><% end %>
-    <%= render "reviews/approve_form", statement: s %>
-    <% if s.reviewed_at %><p class="muted small" style="margin-top:10px">Decidido por <%= s.reviewed_by&.display_name %> em <%= datetime_br(s.reviewed_at) %></p><% end %>
+    <% if s.pending_total.positive? %><div class="callout" style="margin-bottom:14px"><%= icon("hourglass-half") %><span><%= s.pending_total %> entrega(s) ainda em análise neste mês. Ao aprovar as comprovações que fecham as metas, o mês é aprovado sozinho.</span></div><% end %>
+    <%= render "reviews/status", statement: s %>
+    <% if s.reviewed_at %><p class="muted small" style="margin-top:10px">Aprovado em <%= datetime_br(s.reviewed_at) %> (comprovação aprovada por <%= s.reviewed_by&.display_name %>)</p><% end %>
   </div>
 </div>
 

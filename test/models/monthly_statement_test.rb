@@ -43,27 +43,17 @@ class MonthlyStatementTest < ActiveSupport::TestCase
     assert_equal 500.to_d, @inf.statement_for(@month).amount_due
   end
 
-  test "aprovar comprovação não mexe no cupom nem cria a pagar" do
-    fake, calls = fake_coupon
-    with_fake_coupon(fake) do
-      proof("feed").approve!(by: @admin)
-      proofs("stories", 2).each { _1.approve!(by: @admin) }
-    end
-    st = @inf.statement_for(@month)
-    assert st.goal_met?
-    assert_empty calls
-    assert_equal 0, MonthlyStatement.payable.count
-  end
-
-  test "aprovar o mês renova o cupom uma vez e cria o a pagar com vencimento dia 10" do
-    proof("feed").approve!(by: @admin)
-    proofs("stories", 2).each { _1.approve!(by: @admin) }
-    st = @inf.statement_for(@month)
+  test "comprovação que fecha as metas aprova o mês sozinha: cupom +1 e a pagar dia 10" do
     fake, calls = fake_coupon(limit: 4)
     with_fake_coupon(fake) do
-      st.approve!(by: @admin)
-      st.increment_coupon!
+      assert_not proof("feed").approve!(by: @admin)
+      assert_not proofs("stories", 1).first.approve!(by: @admin)
+      assert_empty calls
+      assert proof("stories").approve!(by: @admin)
+      assert_not @inf.statement_for(@month).auto_approve!(by: @admin) # já aprovado: não renova de novo
+      assert_raises(ActiveRecord::RecordInvalid) { proof("stories") } # mês fechado para novos envios
     end
+    st = @inf.statement_for(@month)
     assert st.approved?
     assert_equal 1000.to_d, st.amount_payable
     assert_equal Date.new(2026, 11, 10), st.due_on
@@ -71,6 +61,14 @@ class MonthlyStatementTest < ActiveSupport::TestCase
     assert_equal 4, st.coupon_usage_limit
     assert_equal 1, calls.size
     assert_includes MonthlyStatement.payable, st
+  end
+
+  test "sem cumprir todas as metas o mês continua aberto" do
+    fake, calls = fake_coupon
+    with_fake_coupon(fake) { proof("feed").approve!(by: @admin) }
+    assert @inf.statement_for(@month).review_open?
+    assert_empty calls
+    assert_equal 0, MonthlyStatement.payable.count
   end
 
   test "aprovar com valor ajustado e sem renovar cupom" do

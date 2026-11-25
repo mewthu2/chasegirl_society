@@ -3,7 +3,7 @@ class InfluencersController < ApplicationController
   before_action :set_influencer, except: %i[index new create]
 
   PERMITTED_FIELDS = %i[name instagram tiktok city followers pix_key phone notes active
-                        feed_goal stories_goal tiktok_goal cash_value permuta_value cash_is_permuta coupon_code starts_on ends_on].freeze
+                        feed_goal stories_goal tiktok_goal cash_value permuta_value cash_is_permuta coupon_code].freeze
 
   def index
     scope = Influencer.ordered.includes(:user)
@@ -23,14 +23,13 @@ class InfluencersController < ApplicationController
   end
 
   def new
-    @influencer = Influencer.new(feed_goal: 1, stories_goal: 4, tiktok_goal: 1, cash_value: 1000, permuta_value: 1500,
-                                 starts_on: Date.current, ends_on: 3.months.from_now.to_date)
+    @influencer = Influencer.new(feed_goal: 1, stories_goal: 4, tiktok_goal: 1, cash_value: 1000, permuta_value: 1500)
   end
 
   def create
     @influencer = Influencer.new(influencer_params)
     if @influencer.save
-      redirect_to @influencer, notice: "Influenciadora cadastrada. Agora crie o acesso dela."
+      redirect_to @influencer, **with_coupon("Influenciadora cadastrada. Agora crie o acesso dela.")
     else
       render :new, status: :unprocessable_entity
     end
@@ -40,7 +39,8 @@ class InfluencersController < ApplicationController
 
   def update
     if @influencer.update(influencer_params)
-      redirect_to @influencer, notice: "Cadastro atualizado."
+      msg = "Cadastro atualizado."
+      redirect_to @influencer, **(@influencer.saved_change_to_coupon_code? ? with_coupon(msg) : { notice: msg })
     else
       render :edit, status: :unprocessable_entity
     end
@@ -113,4 +113,17 @@ class InfluencersController < ApplicationController
   def set_influencer = @influencer = Influencer.find(params[:id])
 
   def influencer_params = params.require(:influencer).permit(*PERMITTED_FIELDS)
+
+  # Cupom novo na Shopify com 1 uso (valor = permuta). Cada mês cumprido libera +1.
+  def with_coupon(msg)
+    code = @influencer.coupon_code
+    return { notice: msg } if code.blank?
+
+    case ShopifyCoupon.new(code).create!(amount: @influencer.permuta_value)
+    when :created then { notice: "#{msg} Cupom #{code} criado na Shopify com 1 uso (#{helpers.brl(@influencer.permuta_value)})." }
+    else { notice: "#{msg} Cupom #{code} já existia na Shopify: não foi alterado." }
+    end
+  rescue ShopifyCoupon::Error => e
+    { alert: "#{msg} Mas o cupom #{code} NÃO foi criado na Shopify: #{e.message}" }
+  end
 end

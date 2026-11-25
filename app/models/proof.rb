@@ -49,8 +49,10 @@ class Proof < ApplicationRecord
     influencer.monthly_statements.find_by(month: month.to_date.beginning_of_month)&.approved? || false
   end
 
+  # Se esta aprovação fechar as metas do mês, o mês é aprovado na hora (cupom + a pagar).
   def approve!(by:)
     review!("approved", by:, note: nil)
+    influencer.statement_for(month).auto_approve!(by:)
   end
 
   def reject!(by:, note:)

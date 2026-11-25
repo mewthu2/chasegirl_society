@@ -14,9 +14,7 @@
       <div class="sb-section-title">Marketing</div>
       <%= nav_link "Influenciadoras", influencers_path, "users", desc: "Cadastro, metas e acessos", active: controller_name == "influencers" || controller_name == "portal" %>
       <%= nav_link "Comprovações", proofs_path, "images", desc: "Prints e links enviados", active: controller_name == "proofs", badge: pending %>
-      <% review_month = MonthlyStatement.review_month %>
-      <%= nav_link "Conferência", reviews_path, "magnifying-glass", desc: "#{month_label(review_month)} · até dia #{MonthlyStatement::REVIEW_DAYS}", active: controller_name == "reviews",
-            badge: (MonthlyStatement.phase(review_month) == :review ? MonthlyStatement.awaiting_review_count(review_month) : nil) %>
+      <%= nav_link "Conferência", reviews_path, "magnifying-glass", desc: "Quem cumpriu as metas e cupons", active: controller_name == "reviews" %>
 
       <div class="sb-section-title">Financeiro</div>
       <%= nav_link "A pagar", statements_path, "wallet", desc: "Meses aprovados · dia 10", active: controller_name == "statements" && action_name != "paid", badge: MonthlyStatement.payable.count %>

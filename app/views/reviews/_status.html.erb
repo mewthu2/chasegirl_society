@@ -1,0 +1,29 @@
+<%# Situação do mês na conferência (sem aprovação manual: o mês aprova sozinho ao cumprir as metas). locals: statement %>
+<% s = statement %>
+<div class="row-actions">
+  <% if s.paid? %>
+    <%= status_chip("paid", "Pago #{brl(s.amount_paid)}") %>
+  <% elsif s.approved? %>
+    <%= status_chip("approved", "Cumpriu · #{brl(s.amount_payable)}") %>
+  <% elsif s.rejected? %>
+    <%= status_chip("rejected", s.review_label) %>
+  <% elsif s.phase == :running %>
+    <span class="muted small"><%= icon("hourglass-half") %> Em andamento</span>
+  <% else %>
+    <span class="muted small"><%= icon("xmark") %> Não cumpriu</span>
+  <% end %>
+
+  <% if s.approved? %>
+    <% if s.coupon_done? %>
+      <span class="small" title="Renovado em <%= datetime_br(s.coupon_incremented_at) %>"><%= icon("ticket") %> Cupom renovado (limite <%= s.coupon_usage_limit %>)</span>
+    <% elsif s.influencer.coupon_code.present? %>
+      <%= button_to coupon_review_path(s), class: "btn btn-secondary btn-sm", title: s.coupon_error do %><%= icon("rotate") %>Renovar cupom<% end %>
+    <% else %>
+      <span class="muted small"><%= icon("ticket") %> Sem cupom</span>
+    <% end %>
+  <% end %>
+
+  <% unless s.review_open? || s.paid? %>
+    <%= button_to icon("rotate-left"), reopen_review_path(s), class: "icon-btn", title: "Voltar para conferência (remove o a pagar)", form: { data: { turbo_confirm: "Voltar #{s.influencer.name} para conferência? O a pagar é removido; o uso já liberado no cupom continua." } } %>
+  <% end %>
+</div>

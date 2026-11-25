@@ -13,9 +13,6 @@ class DashboardController < ApplicationController
     @payable_total = payable.sum(:amount_payable)
     @payable_count = payable.count
 
-    @review_month = MonthlyStatement.review_month
-    @review_phase = MonthlyStatement.phase(@review_month)
-    @review_open = MonthlyStatement.awaiting_review_count(@review_month) if @review_phase == :review
     @contracted = @statements.sum(&:amount_contracted)
 
     @channel_totals = Influencer::CHANNELS.index_with do |kind|

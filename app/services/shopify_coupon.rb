@@ -1,6 +1,7 @@
 require "net/http"
 
-# Lê e ajusta o "número máximo de usos" de um cupom (código de desconto) na Shopify.
+# Cria, lê e ajusta o "número máximo de usos" de um cupom (código de desconto) na Shopify.
+# Cupom novo nasce com 1 uso; cada mês com metas cumpridas libera +1.
 # Precisa de SHOPIFY_ACCESS_TOKEN com os escopos read_discounts e write_discounts.
 class ShopifyCoupon
   class Error < StandardError; end
@@ -32,15 +33,50 @@ class ShopifyCoupon
     @code = code.to_s.strip
   end
 
+  CREATE = <<~GQL.freeze
+    mutation($input: DiscountCodeBasicInput!) {
+      discountCodeBasicCreate(basicCodeDiscount: $input) {
+        codeDiscountNode { id }
+        userErrors { field message }
+      }
+    }
+  GQL
+
   # => { id:, type:, title:, status:, usage_limit:, used: }
   def lookup
+    find || raise(Error, "Cupom #{@code} não encontrado na Shopify")
+  end
+
+  def find
     node = graphql(LOOKUP, code: @code).dig("codeDiscountNodeByCode")
-    raise Error, "Cupom #{@code} não encontrado na Shopify" unless node
+    return nil unless node
     discount = node["codeDiscount"] || {}
     {
       id: node["id"], type: discount["__typename"], title: discount["title"], status: discount["status"],
       usage_limit: discount["usageLimit"], used: discount["asyncUsageCount"]
     }
+  end
+
+  # Cria o cupom no padrão dos cupons CG: valor fixo (a permuta) no pedido todo, para qualquer
+  # cliente, sem data de fim, não acumula com outros descontos. Se já existe, não mexe nele.
+  # => :created | :exists
+  def create!(amount:, usage_limit: 1)
+    return :exists if find
+
+    raise Error, "Informe o valor da permuta para criar o cupom" unless amount.to_d.positive?
+    input = {
+      title: @code, code: @code, startsAt: Time.current.iso8601, endsAt: nil,
+      usageLimit: usage_limit, appliesOncePerCustomer: false,
+      context: { all: "ALL" },
+      combinesWith: { orderDiscounts: false, productDiscounts: false, shippingDiscounts: false },
+      customerGets: {
+        value: { discountAmount: { amount: format("%.2f", amount.to_d), appliesOnEachItem: false } },
+        items: { all: true }, appliesOnOneTimePurchase: true
+      }
+    }
+    errors = graphql(CREATE, input:).dig("discountCodeBasicCreate", "userErrors")
+    raise Error, errors.map { _1["message"] }.join("; ") if errors.present?
+    :created
   end
 
   def increment_usage_limit!(by: 1)

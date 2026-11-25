@@ -12,14 +12,6 @@
   </div>
 </div>
 
-<% if @review_phase == :review %>
-  <%= link_to reviews_path, class: "phase-banner", style: "color:inherit" do %>
-    <span class="ic"><%= icon("magnifying-glass") %></span>
-    <div class="grow"><b>Conferência de <%= month_label(@review_month) %> aberta até <%= date_br(MonthlyStatement.due_date(@review_month)) %></b><small><%= pluralize(@review_open, "influenciadora aguardando", "influenciadoras aguardando") %> aprovação · aprovar renova o cupom e cria o a pagar</small></div>
-    <span class="btn btn-primary btn-sm">Conferir <%= icon("arrow-right") %></span>
-  <% end %>
-<% end %>
-
 <div class="grid grid-4 stagger">
   <div class="card kpi">
     <div class="kpi-label"><%= icon("hourglass-half") %>Para conferir</div>

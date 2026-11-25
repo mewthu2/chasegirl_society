@@ -57,8 +57,8 @@ class ProofsController < ApplicationController
   end
 
   def approve
-    @proof.approve!(by: current_user)
-    redirect_back fallback_location: proofs_path, notice: approval_notice
+    month_approved = @proof.approve!(by: current_user)
+    redirect_back fallback_location: proofs_path, notice: approval_notice(month_approved)
   end
 
   def reject
@@ -97,9 +97,14 @@ class ProofsController < ApplicationController
     end
   end
 
-  def approval_notice
+  def approval_notice(month_approved)
+    return "Comprovação aprovada." unless month_approved
     statement = @proof.influencer.statement_for(@proof.month)
-    return "Comprovação aprovada." unless statement.goal_met?
-    "Comprovação aprovada. #{@proof.influencer.name} completou as metas de #{helpers.month_label(@proof.month)} — aprove o mês na conferência."
+    msg = "Comprovação aprovada. #{@proof.influencer.name} cumpriu as metas de #{helpers.month_label(@proof.month)}: a pagar #{helpers.brl(statement.amount_payable)} em #{helpers.date_br(statement.due_on)}."
+    msg + case statement.coupon_status
+          when "done" then " Cupom renovado (limite #{statement.coupon_usage_limit})."
+          when "error" then " Cupom NÃO renovado: #{statement.coupon_error}"
+          else ""
+          end
   end
 end

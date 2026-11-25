@@ -32,11 +32,9 @@ Rails.application.routes.draw do
     end
   end
 
-  # Conferência mensal (dia 1 a 10 do mês seguinte)
+  # Conferência mensal (o mês aprova sozinho ao cumprir as metas)
   resources :reviews, path: "conferencia", only: %i[index show] do
     member do
-      post :approve
-      post :reject
       post :reopen
       post :coupon
     end

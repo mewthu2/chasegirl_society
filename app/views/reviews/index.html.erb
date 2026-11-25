@@ -4,7 +4,7 @@
   <div>
     <div class="eyebrow">Marketing</div>
     <h1>Conferência · <%= month_label(selected_month) %></h1>
-    <p class="lead">Do dia 1 ao 10 do mês seguinte: confira as entregas, aprove ou reprove o mês de cada influenciadora.</p>
+    <p class="lead">Quem cumpre todas as metas tem o mês aprovado na hora: o cupom é renovado e o a pagar é criado.</p>
   </div>
   <div class="actions"><%= month_switcher(:reviews_path, filtro: params[:filtro]) %></div>
 </div>
@@ -12,16 +12,16 @@
 <%= render "reviews/phase_banner" %>
 
 <div class="grid grid-4 stagger">
-  <div class="card kpi"><div class="kpi-label"><%= icon("magnifying-glass") %>Aguardando</div><div class="kpi-value"><%= @counts["open"].to_i %></div><div class="kpi-sub">para conferir</div></div>
-  <div class="card kpi"><div class="kpi-label"><%= icon("check") %>Aprovados</div><div class="kpi-value"><%= @counts["approved"].to_i %></div><div class="kpi-sub">cupom renovado + a pagar criado</div></div>
-  <div class="card kpi"><div class="kpi-label"><%= icon("xmark") %>Reprovados</div><div class="kpi-value"><%= @counts["rejected"].to_i %></div><div class="kpi-sub">sem pagamento</div></div>
+  <div class="card kpi"><div class="kpi-label"><%= icon("check") %>Cumpriram</div><div class="kpi-value"><%= @counts["approved"].to_i %></div><div class="kpi-sub">cupom renovado + a pagar criado</div></div>
+  <div class="card kpi"><div class="kpi-label"><%= icon("hourglass-half") %>Faltando</div><div class="kpi-value"><%= @counts["open"].to_i %></div><div class="kpi-sub">metas ainda não cumpridas</div></div>
+  <div class="card kpi"><div class="kpi-label"><%= icon("ticket") %>Cupom com falha</div><div class="kpi-value"><%= @coupon_errors %></div><div class="kpi-sub">tentar renovar de novo</div></div>
   <div class="card kpi"><div class="kpi-label"><%= icon("hourglass-half") %>Provas pendentes</div><div class="kpi-value"><%= Proof.pending.for_month(selected_month).count %></div><div class="kpi-sub"><%= link_to "conferir comprovações", proofs_path(mes: month_param(selected_month)) %></div></div>
 </div>
 
 <div class="card" style="margin-top:18px">
   <div class="toolbar">
     <div class="seg">
-      <% { "todas" => "Todas", "open" => "Aguardando", "approved" => "Aprovadas", "rejected" => "Reprovadas" }.each do |key, label| %>
+      <% { "todas" => "Todas", "approved" => "Cumpriram", "open" => "Faltando" }.each do |key, label| %>
         <%= link_to label, reviews_path(mes: month_param(selected_month), filtro: key), class: ("is-active" if @filter == key) %>
       <% end %>
     </div>
@@ -29,7 +29,7 @@
   <div class="table-wrap">
     <table class="table">
       <thead>
-        <tr><th>Influenciadora</th><% Influencer::CHANNELS.each do |k| %><th><%= Influencer.channel_label(k) %></th><% end %><th class="right">Combinado</th><th class="right">Sugerido</th><th class="right">Conferência</th></tr>
+        <tr><th>Influenciadora</th><% Influencer::CHANNELS.each do |k| %><th><%= Influencer.channel_label(k) %></th><% end %><th class="right">Combinado</th><th class="right">Situação</th></tr>
       </thead>
       <tbody>
         <% @statements.each do |s| %>
@@ -44,11 +44,10 @@
               </td>
             <% end %>
             <td class="right nowrap muted"><%= brl(s.amount_contracted) %></td>
-            <td class="right nowrap"><b><%= brl(s.amount_due) %></b></td>
-            <td class="right"><%= render "reviews/approve_form", statement: s, compact: true %></td>
+            <td class="right"><%= render "reviews/status", statement: s %></td>
           </tr>
         <% end %>
-        <% if @statements.empty? %><tr><td colspan="7"><div class="empty"><i class="fa-solid fa-magnifying-glass"></i><b>Nada para conferir</b></div></td></tr><% end %>
+        <% if @statements.empty? %><tr><td colspan="6"><div class="empty"><i class="fa-solid fa-magnifying-glass"></i><b>Nada para conferir</b></div></td></tr><% end %>
       </tbody>
     </table>
   </div>

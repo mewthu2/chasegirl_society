@@ -56,13 +56,6 @@ class PermissionsTest < ActionDispatch::IntegrationTest
     assert_not st.reload.paid?
   end
 
-  test "não aprova mês ainda em andamento" do
-    login users(:manager)
-    st = @inf.statement_for(Date.current)
-    post approve_review_path(st)
-    assert st.reload.review_open?
-  end
-
   test "gerente não gerencia equipe; admin sim" do
     login users(:manager)
     get users_path
