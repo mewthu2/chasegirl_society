@@ -2,11 +2,11 @@ class Proof < ApplicationRecord
   STATUSES = %w[pending approved rejected].freeze
   STATUS_LABELS = { "pending" => "Em análise", "approved" => "Aprovada", "rejected" => "Recusada" }.freeze
   MAX_IMAGES = 15
-  # O que cada canal exige: Feed = link; Stories = print (story não tem link); TikTok = link e print.
+  # O que cada canal exige: Stories = print (story não tem link); Feed e TikTok = só o link.
   LINK_KINDS = %w[feed tiktok].freeze
-  PHOTO_KINDS = %w[stories tiktok].freeze
+  PHOTO_KINDS = %w[stories].freeze
   KIND_HINTS = { "feed" => "Post no feed ou Reels · link", "stories" => "Um story por envio · print",
-                 "tiktok" => "Vídeo no TikTok · link e print" }.freeze
+                 "tiktok" => "Vídeo no TikTok · link" }.freeze
 
   belongs_to :influencer
   belongs_to :submitted_by, class_name: "User", optional: true
@@ -68,7 +68,7 @@ class Proof < ApplicationRecord
   end
 
   def normalize_month
-    self.link = nil if kind == "stories"
+    self.link = nil unless needs_link?
     self.link = link.to_s.strip.presence && (link.strip.match?(%r{\Ahttps?://}i) ? link.strip : "https://#{link.strip}")
     # Cada envio é UMA tarefa (1 story, 1 post, 1 TikTok), com quantas fotos forem precisas.
     self.quantity = 1

@@ -47,8 +47,8 @@
         <% end %>
         <div class="dropzone" data-upload-target="zone" data-action="dragover->upload#over dragleave->upload#leave drop->upload#leave">
           <div class="dz-icon"><%= icon("camera") %></div>
-          <b>Toque para adicionar os prints <span data-proof-kind-target="photoMark">*</span></b>
-          <small>Quantas fotos precisar para comprovar esta tarefa (prints, fotos do post, telas do vídeo) · até <%= Proof::MAX_IMAGES %></small>
+          <b>Toque para adicionar os prints *</b>
+          <small>Quantas fotos precisar para comprovar esta tarefa (um ou mais prints do story) · até <%= Proof::MAX_IMAGES %></small>
           <%= f.file_field :images, multiple: true, accept: "image/*,video/*", data: { upload_target: "input", proof_kind_target: "photoInput", action: "change->upload#changed" } %>
         </div>
         <div class="previews" data-upload-target="previews"></div>

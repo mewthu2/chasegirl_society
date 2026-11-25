@@ -1,8 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Mostra o que cada canal exige: Feed = link; Stories = print; TikTok = link e print.
+// Mostra o que cada canal exige: Stories = print; Feed e TikTok = só o link.
 export default class extends Controller {
-  static targets = ["linkField", "linkInput", "photoField", "photoInput", "photoMark"]
+  static targets = ["linkField", "linkInput", "photoField", "photoInput"]
   static values = { link: Array, photo: Array, new: Boolean }
 
   connect() { this.update() }
@@ -16,6 +16,7 @@ export default class extends Controller {
     this.linkInputTarget.required = needsLink
     this.linkInputTarget.disabled = !needsLink
     this.photoInputTarget.required = needsPhoto && this.newValue
-    if (this.hasPhotoMarkTarget) this.photoMarkTarget.hidden = !needsPhoto
+    this.photoFieldTarget.hidden = !needsPhoto
+    this.photoInputTarget.disabled = !needsPhoto
   }
 }

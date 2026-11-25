@@ -22,11 +22,10 @@ class ProofTest < ActiveSupport::TestCase
     assert_nil proof.link
   end
 
-  test "tiktok: link e print" do
+  test "tiktok: só link" do
     @inf.update!(tiktok_goal: 1)
-    assert_not @inf.proofs.new(kind: "tiktok", link: "https://tiktok.com/x").valid?
+    assert @inf.proofs.new(kind: "tiktok", link: "https://tiktok.com/x").valid?
     assert_not @inf.proofs.new(kind: "tiktok", images: [photo]).valid?
-    assert @inf.proofs.new(kind: "tiktok", link: "https://tiktok.com/x", images: [photo]).valid?
   end
 
   test "envio por mês: aceita o anterior, recusa futuro e mês já aprovado" do
@@ -41,12 +40,10 @@ class ProofTest < ActiveSupport::TestCase
   end
 
   test "várias fotos contam como uma única tarefa" do
-    @inf.update!(tiktok_goal: 1)
-    proof = @inf.proofs.create!(kind: "tiktok", quantity: 5, link: "tiktok.com/@bia/1", images: [photo, photo, photo])
-    assert_equal "https://tiktok.com/@bia/1", proof.link
+    proof = @inf.proofs.create!(kind: "stories", quantity: 5, images: [photo, photo, photo])
     assert_equal 1, proof.quantity
     assert_equal 3, proof.images.count
-    assert_equal 1, @inf.statement_for(Date.current).tap { proof.approve!(by: users(:admin)) }.delivered_for("tiktok")
+    assert_equal 1, @inf.statement_for(Date.current).tap { proof.approve!(by: users(:admin)) }.delivered_for("stories")
   end
 
   test "não aceita canal não contratado" do
