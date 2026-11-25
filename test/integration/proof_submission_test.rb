@@ -32,7 +32,8 @@ class ProofSubmissionTest < ActionDispatch::IntegrationTest
     info = { ok: true, code: "CGANA", usage_limit: 3, used: 1, remaining: 2, status: "ACTIVE" }
     Influencer.class_eval { alias_method :__orig_coupon_info, :coupon_info; define_method(:coupon_info) { info } }
     get portal_path
-    assert_select ".quick-coupon .qa-usage", text: /2\s+de 3 usos disponíveis · usado 1x/
+    assert_select ".quick-coupon .qa-facts", text: /2\s*de 3 usos livres/
+    assert_select ".quick-coupon .qa-facts", text: /Usado\s*1x/
     assert_select ".quick-coupon button", text: /Copiar/
   ensure
     Influencer.class_eval { alias_method :coupon_info, :__orig_coupon_info; remove_method :__orig_coupon_info }

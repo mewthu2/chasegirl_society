@@ -9,7 +9,7 @@
 <div class="hero">
   <div class="hero-row">
     <div class="ring" style="--p: <%= s.progress_percent %>"><span><%= s.progress_percent %>%</span></div>
-    <div>
+    <div class="hero-text">
       <div class="eyebrow">Chase Society · <%= month_label(selected_month) %></div>
       <h1>Oi, <%= i.name.split.first %>!</h1>
       <p><%= if s.approved? then "Mês aprovado! Obrigada 🖤" elsif s.goal_met? then "Meta do mês completa. Agora é com a equipe Chase na conferência." else "Envie as provas das suas publicações para completar a meta do mês." end %></p>
@@ -34,26 +34,20 @@
   <% c = @coupon %>
   <div class="quick-action quick-coupon" data-controller="copy">
     <span class="qa-icon"><%= icon("ticket") %></span>
-    <span class="qa-txt">
-      <small>Cupom de permuta · <%= brl(i.permuta_value) %></small>
-      <% if c[:code].present? %>
-        <b class="mono" data-copy-target="source"><%= c[:code] %></b>
-      <% else %>
-        <b>Sem cupom</b>
+    <div class="qa-txt">
+      <small class="qa-label">Cupom de permuta</small>
+      <b class="mono qa-code" data-copy-target="source"><%= c[:code].presence || "—" %></b>
+      <div class="qa-facts">
+        <span>Vale <b><%= brl(i.permuta_value) %></b></span>
+        <% if c[:ok] %>
+          <span><% if c[:usage_limit] %><b><%= c[:remaining] %></b> de <%= c[:usage_limit] %> <%= c[:usage_limit] == 1 ? "uso livre" : "usos livres" %><% else %>Usos ilimitados<% end %></span>
+          <span>Usado <b><%= c[:used] %>x</b><%= { "EXPIRED" => " · expirado", "SCHEDULED" => " · agendado" }[c[:status]] %></span>
+        <% end %>
+      </div>
+      <% unless c[:ok] %>
+        <small class="qa-error"><%= icon("triangle-exclamation") %> <%= staff? ? c[:error] : "Ainda não liberado na loja. Fale com a equipe Chase." %></small>
       <% end %>
-      <% if c[:ok] %>
-        <small class="qa-usage">
-          <% if c[:usage_limit] %>
-            <b><%= c[:remaining] %></b> de <%= c[:usage_limit] %> <%= c[:usage_limit] == 1 ? "uso disponível" : "usos disponíveis" %> · usado <%= c[:used] %>x
-          <% else %>
-            Usos ilimitados · usado <%= c[:used] %>x
-          <% end %>
-          <%= { "EXPIRED" => " · expirado", "SCHEDULED" => " · agendado" }[c[:status]] %>
-        </small>
-      <% else %>
-        <small class="qa-usage qa-error"><%= icon("triangle-exclamation") %> <%= staff? ? c[:error] : "Cupom ainda não liberado na loja. Fale com a equipe Chase." %></small>
-      <% end %>
-    </span>
+    </div>
     <% if c[:ok] %>
       <button type="button" class="btn btn-secondary btn-sm" data-action="copy#copy" data-copy-target="button"><%= icon("copy") %><span>Copiar</span></button>
     <% end %>
