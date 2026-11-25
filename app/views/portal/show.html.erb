@@ -20,6 +20,46 @@
   </div>
 </div>
 
+<div class="quick-actions">
+  <%= link_to new_proof_path(extra), class: "quick-action quick-action-primary" do %>
+    <span class="qa-icon"><%= icon("cloud-arrow-up") %></span>
+    <span class="qa-txt"><b>Enviar comprovações</b><small>Prints e links dos stories e posts</small></span>
+    <%= icon("arrow-right", class: "qa-go") %>
+  <% end %>
+  <%= link_to proofs_path(extra), class: "quick-action" do %>
+    <span class="qa-icon"><%= icon("images") %></span>
+    <span class="qa-txt"><b>Minhas comprovações</b><small>Histórico e situação dos envios</small></span>
+    <%= icon("arrow-right", class: "qa-go") %>
+  <% end %>
+  <% c = @coupon %>
+  <div class="quick-action quick-coupon" data-controller="copy">
+    <span class="qa-icon"><%= icon("ticket") %></span>
+    <span class="qa-txt">
+      <small>Cupom de permuta · <%= brl(i.permuta_value) %></small>
+      <% if c[:code].present? %>
+        <b class="mono" data-copy-target="source"><%= c[:code] %></b>
+      <% else %>
+        <b>Sem cupom</b>
+      <% end %>
+      <% if c[:ok] %>
+        <small class="qa-usage">
+          <% if c[:usage_limit] %>
+            <b><%= c[:remaining] %></b> de <%= c[:usage_limit] %> <%= c[:usage_limit] == 1 ? "uso disponível" : "usos disponíveis" %> · usado <%= c[:used] %>x
+          <% else %>
+            Usos ilimitados · usado <%= c[:used] %>x
+          <% end %>
+          <%= { "EXPIRED" => " · expirado", "SCHEDULED" => " · agendado" }[c[:status]] %>
+        </small>
+      <% else %>
+        <small class="qa-usage qa-error"><%= icon("triangle-exclamation") %> <%= staff? ? c[:error] : "Cupom ainda não liberado na loja. Fale com a equipe Chase." %></small>
+      <% end %>
+    </span>
+    <% if c[:ok] %>
+      <button type="button" class="btn btn-secondary btn-sm" data-action="copy#copy" data-copy-target="button"><%= icon("copy") %><span>Copiar</span></button>
+    <% end %>
+  </div>
+</div>
+
 <%= render "shared/channels", statement: s %>
 
 <div class="card" style="margin-top:16px">

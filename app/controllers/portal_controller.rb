@@ -4,7 +4,8 @@ class PortalController < ApplicationController
   def show
     @statement = @influencer.statement_for(selected_month)
     @proofs = @influencer.proofs.for_month(selected_month).includes(images_attachments: :blob).recent
-    @history = @influencer.monthly_statements.where.not(month: selected_month).order(month: :desc).limit(6)
+    @coupon = @influencer.coupon_info
+    @history =@influencer.monthly_statements.where.not(month: selected_month).order(month: :desc).limit(6)
   end
 
   private

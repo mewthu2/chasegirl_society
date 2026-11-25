@@ -105,15 +105,38 @@ class Influencer < ApplicationRecord
   # da permuta (se já existir lá, não mexe). Falha na Shopify não impede o cadastro: fica no log.
   # => :created | :exists | nil
   def ensure_coupon!
-    if coupon_code.blank?
-      code = default_coupon_code
-      return nil if code.blank? || self.class.where.not(id:).exists?(coupon_code: code)
-      update!(coupon_code: code)
-    end
-    ShopifyCoupon.new(coupon_code).create!(amount: permuta_value)
+    ensure_coupon_or_raise!
   rescue ShopifyCoupon::Error => e
     Rails.logger.error("[Cupom] #{name} (#{coupon_code}): #{e.message}")
     nil
+  end
+
+  def ensure_coupon_or_raise!
+    if coupon_code.blank?
+      code = default_coupon_code
+      raise ShopifyCoupon::Error, "Cadastre o @ do Instagram para gerar o cupom" if code.blank?
+      raise ShopifyCoupon::Error, "O código #{code} já é de outra influenciadora" if self.class.where.not(id:).exists?(coupon_code: code)
+      update!(coupon_code: code)
+    end
+    ShopifyCoupon.new(coupon_code).create!(amount: permuta_value)
+  end
+
+  # Situação do cupom na Shopify para mostrar na área dela (consulta guardada por 5 min).
+  # Se o cupom ainda não existe lá (ex.: a criação no cadastro falhou), tenta criar agora.
+  # => { ok: true, code:, usage_limit:, used:, remaining:, status: } | { ok: false, code:, error: }
+  def coupon_info
+    return { ok: false, code: nil, error: "Cadastre o @ do Instagram para gerar o cupom." } if coupon_code.blank? && default_coupon_code.blank?
+
+    Rails.cache.fetch(["coupon_info", id, coupon_code, permuta_value.to_s], expires_in: 5.minutes, skip_nil: true) do
+      ensure_coupon_or_raise!
+      info = ShopifyCoupon.new(coupon_code).lookup
+      limit = info[:usage_limit]
+      used = info[:used].to_i
+      { ok: true, code: coupon_code, usage_limit: limit, used:, remaining: limit && [limit - used, 0].max, status: info[:status] }
+    end
+  rescue ShopifyCoupon::Error, ActiveRecord::ActiveRecordError => e
+    Rails.logger.error("[Cupom] #{name} (#{coupon_code}): #{e.message}")
+    { ok: false, code: coupon_code, error: e.message }
   end
 
   # Desligar: perde o acesso à área dela na hora; metas, comprovações e histórico ficam guardados.

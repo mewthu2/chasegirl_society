@@ -462,3 +462,25 @@ body.auth { min-height: 100vh; }
 .field .input-prefix input { border: 0; border-radius: 0; background: transparent; }
 .field .input-prefix:focus-within { border-color: #9a9a9a; box-shadow: 0 0 0 3px rgba(255,255,255,.08); }
 .field .input-prefix input:focus { box-shadow: none; }
+
+/* Minha área: atalhos principais (enviar, minhas comprovações, cupom) */
+.quick-actions { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-bottom: 18px; }
+.quick-action { display: flex; align-items: center; gap: 14px; padding: 18px 20px; min-height: 84px; border-radius: var(--r-lg); border: 1px solid var(--border-2); background: linear-gradient(180deg, var(--surface-2), var(--surface)); color: var(--text); text-decoration: none; transition: transform var(--t-fast) var(--ease), border-color var(--t-fast), box-shadow var(--t-fast); }
+a.quick-action:hover { transform: translateY(-2px); border-color: var(--border-3); box-shadow: var(--shadow-2); }
+.quick-action .qa-icon { width: 44px; height: 44px; flex: none; border-radius: 12px; display: grid; place-items: center; font-size: 18px; background: var(--surface-4); }
+.quick-action .qa-txt { display: flex; flex-direction: column; min-width: 0; flex: 1; }
+.quick-action .qa-txt b { font-size: 15.5px; font-weight: 700; letter-spacing: -.01em; }
+.quick-action .qa-txt small { font-size: 12.5px; color: var(--text-3); }
+.quick-action .qa-go { color: var(--text-3); transition: transform var(--t-fast) var(--ease); }
+a.quick-action:hover .qa-go { transform: translateX(3px); color: var(--text); }
+.quick-action-primary { color: var(--accent-ink); background: linear-gradient(180deg, #ffffff, #d4d4d4); border-color: rgba(255,255,255,.4); box-shadow: 0 6px 18px -6px var(--glow); }
+.quick-action-primary .qa-icon { background: #0b0b0b; color: #fff; }
+.quick-action-primary .qa-txt small, .quick-action-primary .qa-go { color: #444; }
+a.quick-action-primary:hover .qa-go { color: #000; }
+.quick-coupon { border-style: dashed; border-color: var(--border-3); }
+.quick-coupon .qa-txt b.mono { font-size: 18px; letter-spacing: .04em; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+@media (max-width: 900px) { .quick-actions { grid-template-columns: 1fr; } .quick-action { min-height: 72px; padding: 14px 16px; } }
+.quick-coupon .qa-usage { margin-top: 2px; color: var(--text-2); }
+.quick-coupon .qa-usage b { font-size: inherit; font-weight: 700; color: var(--text); }
+.quick-coupon .qa-error { color: var(--text-2); }
+.quick-coupon .qa-error i { margin-right: 4px; }

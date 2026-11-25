@@ -15,6 +15,29 @@ class ProofSubmissionTest < ActionDispatch::IntegrationTest
     assert_select "#comprovar", 0
   end
 
+  test "minha área tem atalhos para enviar, ver comprovações e o cupom" do
+    @inf.update!(coupon_code: "CGANA")
+    get portal_path
+    assert_response :success
+    assert_select ".quick-actions a[href='#{new_proof_path}']", text: /Enviar comprovações/
+    assert_select ".quick-actions a[href='#{proofs_path}']", text: /Minhas comprovações/
+    assert_select ".quick-coupon", text: /CGANA/
+    # Sem Shopify no teste: avisa que o cupom não está liberado, sem botão de copiar
+    assert_select ".quick-coupon .qa-error"
+    assert_select ".quick-coupon button", 0
+  end
+
+  test "cupom da Shopify mostra usos disponíveis e quantos já foram usados" do
+    @inf.update!(coupon_code: "CGANA")
+    info = { ok: true, code: "CGANA", usage_limit: 3, used: 1, remaining: 2, status: "ACTIVE" }
+    Influencer.class_eval { alias_method :__orig_coupon_info, :coupon_info; define_method(:coupon_info) { info } }
+    get portal_path
+    assert_select ".quick-coupon .qa-usage", text: /2\s+de 3 usos disponíveis · usado 1x/
+    assert_select ".quick-coupon button", text: /Copiar/
+  ensure
+    Influencer.class_eval { alias_method :coupon_info, :__orig_coupon_info; remove_method :__orig_coupon_info }
+  end
+
   test "envia comprovação de feed só com link, sempre para o mês atual" do
     current = Date.current.beginning_of_month
     get new_proof_path
