@@ -10,7 +10,11 @@ class Influencer < ApplicationRecord
   normalizes :tiktok, with: ->(v) { v.to_s.strip.delete_prefix("@").presence }
   normalizes :coupon_code, with: ->(v) { v.to_s.strip.upcase.presence }
 
+  PIX_KEY_TYPES = { "cpf" => "CPF", "cnpj" => "CNPJ", "email" => "E-mail", "phone" => "Telefone", "random" => "Chave aleatória" }.freeze
+
   validates :name, presence: true
+  validates :pix_key_type, inclusion: { in: PIX_KEY_TYPES.keys, message: "escolha o tipo da chave PIX" }, allow_blank: true
+  validates :pix_key_type, presence: { message: "informe o tipo da chave PIX" }, if: -> { pix_key.present? && will_save_change_to_pix_key? }
   validates :coupon_code, uniqueness: true, allow_nil: true
   validates :instagram, uniqueness: { case_sensitive: false, message: "já está cadastrado em outra influenciadora" }, allow_nil: true
   validates :instagram, format: { with: /\A[a-z0-9._]+\z/, message: "deve ter só letras, números, ponto e _" }, allow_nil: true
@@ -74,6 +78,25 @@ class Influencer < ApplicationRecord
   def initials = name.split.first(2).map { _1[0] }.join.upcase
 
   def reset_channel_cache! = @channel_values = nil
+
+  def pix_key_type_label = PIX_KEY_TYPES[pix_key_type]
+
+  # Tipo pela cara da chave, só quando não há dúvida (11 dígitos soltos pode ser CPF ou celular).
+  def self.guess_pix_key_type(key)
+    key = key.to_s.strip
+    if key.include?("@") then "email"
+    elsif key.match?(/\A\h{8}-\h{4}-\h{4}-\h{4}-\h{12}\z/) then "random"
+    elsif key.match?(/\A\d{3}\.\d{3}\.\d{3}-\d{2}\z/) then "cpf"
+    elsif key.match?(%r{\A\d{2}\.?\d{3}\.?\d{3}/?\d{4}-?\d{2}\z}) then "cnpj"
+    elsif key.start_with?("+") || key.match?(/\A\(\d{2}\)/) then "phone"
+    end
+  end
+
+  # "CPF · 123.456.789-00" (ou só a chave, se o tipo não foi informado)
+  def pix_label
+    return nil if pix_key.blank?
+    [pix_key_type_label, pix_key].compact.join(" · ")
+  end
 
   # Cupom padrão: CG + @ do Instagram (ex.: @palomaleuze → CGPALOMALEUZE).
   def default_coupon_code = instagram.present? ? "CG#{instagram.upcase}" : nil

@@ -13,6 +13,7 @@
           <%= fields_for :influencer, @influencer do |i| %>
             <div class="field"><%= i.label :phone, "Telefone / WhatsApp" %><%= i.telephone_field :phone, placeholder: "(11) 99999-9999", autocomplete: "tel" %></div>
             <div class="field"><%= i.label :city, "Cidade / Estado" %><%= i.text_field :city, placeholder: "São Paulo/SP" %></div>
+            <div class="field"><%= i.label :pix_key_type, "Tipo da chave PIX" %><%= i.select :pix_key_type, Influencer::PIX_KEY_TYPES.invert, include_blank: "Selecione" %></div>
             <div class="field"><%= i.label :pix_key, "Chave PIX (para receber o cachê)" %><%= i.text_field :pix_key, placeholder: "CPF, e-mail, telefone ou chave aleatória" %></div>
           <% end %>
         <% end %>

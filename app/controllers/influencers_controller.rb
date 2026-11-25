@@ -2,7 +2,7 @@ class InfluencersController < ApplicationController
   before_action :require_staff
   before_action :set_influencer, except: %i[index new create]
 
-  PERMITTED_FIELDS = %i[name instagram tiktok city followers pix_key phone notes active
+  PERMITTED_FIELDS = %i[name instagram tiktok city followers pix_key pix_key_type phone notes active
                         feed_goal stories_goal tiktok_goal cash_value permuta_value cash_is_permuta coupon_code].freeze
 
   def index

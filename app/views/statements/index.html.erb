@@ -47,7 +47,7 @@
             <% i = s.influencer %>
             <tr>
               <td><%= link_to review_path(s), class: "person" do %><%= avatar(i.initials) %><span><b><%= i.name %></b><small>@<%= i.instagram %></small></span><% end %></td>
-              <td class="mono small"><%= i.pix_key.presence || tag.span("a informar", class: "muted") %></td>
+              <td class="mono small"><%= i.pix_label || tag.span("a informar", class: "muted") %></td>
               <td><%= month_label(s.month, short: true) %></td>
               <td class="small muted"><%= s.reviewed_by&.display_name %> · <%= date_br(s.reviewed_at) %></td>
               <td class="right nowrap"><b><%= brl(s.amount_payable) %></b></td>

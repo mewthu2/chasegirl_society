@@ -42,10 +42,10 @@ class StatementsController < ApplicationController
 
   def to_csv(statements)
     CSV.generate(col_sep: ";") do |csv|
-      csv << ["Influenciadora", "Instagram", "Chave PIX", "Competência", "Vencimento", "Valor a pagar", "Aprovado por", "Aprovado em"]
+      csv << ["Influenciadora", "Instagram", "Tipo da chave PIX", "Chave PIX", "Competência", "Vencimento", "Valor a pagar", "Aprovado por", "Aprovado em"]
       statements.each do |s|
         i = s.influencer
-        csv << [i.name, i.instagram, i.pix_key, s.month.strftime("%m/%Y"), s.due_on&.strftime("%d/%m/%Y"),
+        csv << [i.name, i.instagram, i.pix_key_type_label, i.pix_key, s.month.strftime("%m/%Y"), s.due_on&.strftime("%d/%m/%Y"),
                 s.amount_payable.to_s("F").tr(".", ","), s.reviewed_by&.display_name, s.reviewed_at&.strftime("%d/%m/%Y")]
       end
     end

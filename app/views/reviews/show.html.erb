@@ -6,7 +6,7 @@
   <div>
     <div class="eyebrow">Conferência · <%= month_label(s.month) %></div>
     <h1><%= i.name %> <%= status_chip(s.review_status, s.review_label) %></h1>
-    <p class="lead">Chave PIX <span class="mono"><%= i.pix_key.presence || "a informar" %></span> · cupom <span class="mono"><%= i.coupon_code || "—" %></span> · combinado <%= brl(s.amount_contracted) %></p>
+    <p class="lead">Chave PIX <span class="mono"><%= i.pix_label || "a informar" %></span> · cupom <span class="mono"><%= i.coupon_code || "—" %></span> · combinado <%= brl(s.amount_contracted) %></p>
   </div>
   <div class="actions"><%= link_to "Ficha da influenciadora", influencer_path(i, mes: month_param(s.month)), class: "btn btn-secondary" %></div>
 </div>

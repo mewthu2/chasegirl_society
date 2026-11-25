@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_11_25_180000) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_26_120000) do
   # These are extensions that must be enabled in order to support this database
   enable_extension "pg_catalog.plpgsql"
 
@@ -70,6 +70,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_11_25_180000) do
     t.boolean "active", default: true, null: false
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.string "pix_key_type"
     t.index "lower((instagram)::text)", name: "index_influencers_on_lower_instagram", unique: true, where: "(instagram IS NOT NULL)"
     t.index ["coupon_code"], name: "index_influencers_on_coupon_code", unique: true, where: "(coupon_code IS NOT NULL)"
   end

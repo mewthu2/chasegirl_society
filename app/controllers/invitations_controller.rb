@@ -4,7 +4,7 @@ class InvitationsController < ApplicationController
   before_action :set_user
   layout "auth"
 
-  PROFILE_FIELDS = %i[phone city pix_key].freeze
+  PROFILE_FIELDS = %i[phone city pix_key_type pix_key].freeze
 
   def show; end
 

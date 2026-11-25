@@ -26,4 +26,20 @@ class InfluencerTest < ActiveSupport::TestCase
   test "exige ao menos um canal" do
     assert_not build(feed_goal: 0, stories_goal: 0, tiktok_goal: 0).valid?
   end
+
+  test "chave PIX exige o tipo e mostra junto" do
+    inf = Influencer.create!(name: "Pix", feed_goal: 1, stories_goal: 0, tiktok_goal: 0, cash_value: 1000)
+    assert_not inf.update(pix_key: "123.456.789-00")
+    assert_includes inf.errors[:pix_key_type], "informe o tipo da chave PIX"
+    assert inf.update(pix_key: "123.456.789-00", pix_key_type: "cpf")
+    assert_equal "CPF · 123.456.789-00", inf.pix_label
+    assert_not inf.update(pix_key_type: "outro")
+  end
+
+  test "adivinha o tipo da chave só quando não há dúvida" do
+    assert_equal "email", Influencer.guess_pix_key_type("ana@gmail.com")
+    assert_equal "cnpj", Influencer.guess_pix_key_type("12.345.678/0001-90")
+    assert_equal "random", Influencer.guess_pix_key_type("123e4567-e89b-12d3-a456-426614174000")
+    assert_nil Influencer.guess_pix_key_type("11999990000")
+  end
 end

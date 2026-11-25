@@ -33,6 +33,7 @@ namespace :import do
         pix_key: (k = clean_key.(row["CHAVE/PIX"])) && !k.casecmp?("PERMUTA") ? k : inf.pix_key,
         phone: clean_key.(row["TELEFONE"])
       )
+      inf.pix_key_type ||= Influencer.guess_pix_key_type(inf.pix_key)
       was_new = inf.new_record?
       if inf.save
         was_new ? created += 1 : updated += 1

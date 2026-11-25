@@ -29,8 +29,9 @@
   <div class="card">
     <div class="card-head"><h2>Pagamento e situação</h2></div>
     <div class="card-body form-grid">
-      <div class="field span-6"><%= f.label :pix_key, "Chave PIX" %><%= f.text_field :pix_key %></div>
-      <div class="field span-6" style="justify-content:flex-end"><label class="check"><%= f.check_box :active %> Parceria ativa</label></div>
+      <div class="field span-4"><%= f.label :pix_key_type, "Tipo da chave PIX" %><%= f.select :pix_key_type, Influencer::PIX_KEY_TYPES.invert, include_blank: "Selecione" %></div>
+      <div class="field span-4"><%= f.label :pix_key, "Chave PIX" %><%= f.text_field :pix_key %></div>
+      <div class="field span-4" style="justify-content:flex-end"><label class="check"><%= f.check_box :active %> Parceria ativa</label></div>
       <div class="field span-12"><%= f.label :notes, "Observações" %><%= f.text_area :notes, rows: 3 %></div>
     </div>
   </div>

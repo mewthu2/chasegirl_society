@@ -34,7 +34,7 @@ class InvitationTest < ActionDispatch::IntegrationTest
     assert_response :success
 
     patch invitation_path(token), params: { user: { password: "minha123", password_confirmation: "minha123" },
-                                            influencer: { phone: "11 99999-0000", pix_key: "bia@pix", city: "SP" } }
+                                            influencer: { phone: "11 99999-0000", pix_key_type: "email", pix_key: "bia@pix", city: "SP" } }
     assert_redirected_to portal_path
     assert user.reload.activated?
     assert user.authenticate("minha123")
