@@ -39,11 +39,21 @@ class ProofTest < ActiveSupport::TestCase
     assert_equal [current], Proof.month_options(@inf)
   end
 
-  test "várias fotos contam como uma única tarefa" do
+  test "stories: cada print conta como uma entrega" do
     proof = @inf.proofs.create!(kind: "stories", quantity: 5, images: [photo, photo, photo])
-    assert_equal 1, proof.quantity
-    assert_equal 3, proof.images.count
-    assert_equal 1, @inf.statement_for(Date.current).tap { proof.approve!(by: users(:admin)) }.delivered_for("stories")
+    assert_equal 3, proof.quantity
+    assert_equal 3, @inf.statement_for(Date.current).tap { proof.approve!(by: users(:admin)) }.delivered_for("stories")
+  end
+
+  test "stories: prints adicionados depois também contam" do
+    proof = @inf.proofs.create!(kind: "stories", images: [photo])
+    proof.images.attach(photo)
+    proof.update!(description: "mais um")
+    assert_equal 2, proof.reload.quantity
+  end
+
+  test "feed: continua uma entrega por envio" do
+    assert_equal 1, @inf.proofs.create!(kind: "feed", link: "https://instagram.com/p/x", quantity: 4).quantity
   end
 
   test "não aceita canal não contratado" do

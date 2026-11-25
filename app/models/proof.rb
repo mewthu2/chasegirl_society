@@ -5,7 +5,7 @@ class Proof < ApplicationRecord
   # O que cada canal exige: Stories = print (story não tem link); Feed e TikTok = só o link.
   LINK_KINDS = %w[feed tiktok].freeze
   PHOTO_KINDS = %w[stories].freeze
-  KIND_HINTS = { "feed" => "Post no feed ou Reels · link", "stories" => "Um story por envio · print",
+  KIND_HINTS = { "feed" => "Post no feed ou Reels · link", "stories" => "Cada print = 1 story · envie vários de uma vez",
                  "tiktok" => "Vídeo no TikTok · link" }.freeze
 
   belongs_to :influencer
@@ -37,6 +37,7 @@ class Proof < ApplicationRecord
   def kind_label = Influencer.channel_label(kind)
   def needs_link? = LINK_KINDS.include?(kind)
   def needs_photo? = PHOTO_KINDS.include?(kind)
+  def deliveries_label = "#{quantity} #{quantity == 1 ? 'entrega' : 'entregas'}"
 
   # Meses em que dá para enviar: o atual e o anterior (enquanto não foi aprovado na conferência).
   def self.month_options(influencer, today: Date.current)
@@ -70,8 +71,8 @@ class Proof < ApplicationRecord
   def normalize_month
     self.link = nil unless needs_link?
     self.link = link.to_s.strip.presence && (link.strip.match?(%r{\Ahttps?://}i) ? link.strip : "https://#{link.strip}")
-    # Cada envio é UMA tarefa (1 story, 1 post, 1 TikTok), com quantas fotos forem precisas.
-    self.quantity = 1
+    # Stories: cada print (ou vídeo) é um story entregue. Feed e TikTok: um envio = uma entrega.
+    self.quantity = needs_photo? ? [images.size, 1].max : 1
     self.month = (month || posted_on || Date.current).to_date.beginning_of_month
   end
 

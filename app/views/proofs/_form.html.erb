@@ -7,7 +7,7 @@
   <div class="card">
     <div class="card-head">
       <h2>O que você está comprovando?</h2>
-      <span class="muted small" style="margin-left:auto">Uma tarefa por envio</span>
+      <span class="muted small" style="margin-left:auto">Stories: cada print conta 1 · Feed e TikTok: 1 por envio</span>
     </div>
     <div class="card-body form-grid">
       <% months = (Proof.month_options(proof.influencer) | [proof.month&.beginning_of_month].compact).sort %>
@@ -48,10 +48,11 @@
         <div class="dropzone" data-upload-target="zone" data-action="dragover->upload#over dragleave->upload#leave drop->upload#leave">
           <div class="dz-icon"><%= icon("camera") %></div>
           <b>Toque para adicionar os prints *</b>
-          <small>Quantas fotos precisar para comprovar esta tarefa (um ou mais prints do story) · até <%= Proof::MAX_IMAGES %></small>
+          <small><b>Cada print conta como 1 story entregue.</b> Postou 5 stories? Envie os 5 prints aqui de uma vez · até <%= Proof::MAX_IMAGES %></small>
           <%= f.file_field :images, multiple: true, accept: "image/*,video/*", data: { upload_target: "input", proof_kind_target: "photoInput", action: "change->upload#changed" } %>
         </div>
         <div class="previews" data-upload-target="previews"></div>
+        <div class="hint" data-upload-target="count" hidden></div>
         <span class="uploading" style="margin-top:10px"><span class="spinner"></span>Preparando as fotos…</span>
       </div>
       <div class="field span-12"><%= f.label :description, "Observação (opcional)" %><%= f.text_area :description, rows: 2, placeholder: "Algo que a equipe Chase precisa saber?" %></div>

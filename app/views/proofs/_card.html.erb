@@ -16,7 +16,7 @@
     <div class="pc-meta">
       <span><%= icon(channel_icon(proof.kind)) %><%= proof.kind_label %></span>
       <span><%= icon("calendar") %><%= month_label(proof.month, short: true) %></span>
-      <span><%= icon("layer-group") %><%= month_label(proof.month, short: true) %></span>
+      <span><%= icon("layer-group") %><%= proof.deliveries_label %></span>
       <% if imgs.size > 3 %><span><%= icon("images") %><%= imgs.size %> arquivos</span><% end %>
       <% if proof.link.present? %><span><%= link_to proof.link, target: "_blank", rel: "noopener" do %><%= icon("arrow-up-right-from-square") %>Abrir link<% end %></span><% end %>
     </div>

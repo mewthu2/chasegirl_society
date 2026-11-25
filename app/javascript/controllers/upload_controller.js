@@ -6,7 +6,7 @@ const MAX_SIDE = 1600
 const QUALITY = 0.82
 
 export default class extends Controller {
-  static targets = ["input", "previews", "zone", "submit"]
+  static targets = ["input", "previews", "zone", "submit", "count"]
 
   over(e) { e.preventDefault(); this.zoneTarget.classList.add("is-over") }
   leave() { this.zoneTarget.classList.remove("is-over") }
@@ -14,6 +14,7 @@ export default class extends Controller {
   async changed() {
     this.leave()
     const files = Array.from(this.inputTarget.files)
+    this.showCount(files.length)
     if (!files.length) { this.previewsTarget.innerHTML = ""; return }
 
     this.element.classList.add("is-uploading")
@@ -31,6 +32,12 @@ export default class extends Controller {
       this.element.classList.remove("is-uploading")
       if (this.hasSubmitTarget) this.submitTarget.disabled = false
     }
+  }
+
+  showCount(n) {
+    if (!this.hasCountTarget) return
+    this.countTarget.hidden = n === 0
+    this.countTarget.textContent = n === 1 ? "1 print selecionado = 1 story entregue" : `${n} prints selecionados = ${n} stories entregues`
   }
 
   render(files) {
