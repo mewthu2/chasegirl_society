@@ -2,10 +2,21 @@ class ApplicationController < ActionController::Base
   include Authentication
 
   helper_method :current_user, :staff?
+  before_action :end_blocked_session
+
+  BLOCKED_MESSAGE = "Seu acesso está desligado. Fale com a equipe Chase.".freeze
 
   private
 
   def current_user = Current.session&.user
+
+  # Sessão aberta de influenciadora desligada (ex.: de outro aparelho): sai e volta para o login.
+  def end_blocked_session
+    return unless authenticated? && current_user&.access_blocked?
+
+    terminate_session
+    redirect_to new_session_path, alert: BLOCKED_MESSAGE
+  end
 
   # Equipe Chase: Admin ou Gerente.
   def staff? = current_user&.staff?

@@ -6,11 +6,12 @@
 <div class="page-head">
   <div>
     <div class="eyebrow">Financeiro</div>
-    <h1>A pagar</h1>
+    <h1>A pagar · <%= month_label(selected_month) %></h1>
     <p class="lead">Criado automaticamente quando o mês é aprovado na conferência. Pagamento no dia 10.</p>
   </div>
   <div class="actions">
-    <%= link_to statements_path(format: :csv), class: "btn btn-secondary" do %><%= icon("file-csv") %>Exportar<% end %>
+    <%= month_switcher(:statements_path) %>
+    <%= link_to statements_path(format: :csv, mes: month_param(selected_month)), class: "btn btn-secondary" do %><%= icon("file-csv") %>Exportar<% end %>
     <% if current_user.can_pay? %><%= link_to paid_statements_path, class: "btn btn-ghost" do %><%= icon("check-double") %>Pagos<% end %><% end %>
   </div>
 </div>
@@ -21,8 +22,15 @@
   <div class="card kpi"><div class="kpi-label"><%= icon("triangle-exclamation") %>Vencidos</div><% late = @statements.select { _1.due_on && _1.due_on < Date.current } %><div class="kpi-value"><%= late.size %></div><div class="kpi-sub"><%= brl(late.sum { _1.amount_payable.to_d }) %></div></div>
 </div>
 
+<% if @other_months.any? %>
+  <div class="callout" style="margin-top:18px"><%= icon("circle-info") %><span>
+    Também há a pagar em outros meses:
+    <%= safe_join(@other_months.map { |month, n| link_to("#{month_label(month, short: true)} (#{n})", statements_path(mes: month_param(month))) }, " · ") %>
+  </span></div>
+<% end %>
+
 <% if @statements.empty? %>
-  <div class="card" style="margin-top:18px"><div class="empty"><i class="fa-solid fa-wallet"></i><b>Nada a pagar</b>Os pagamentos aparecem aqui quando o mês é aprovado na <%= link_to "conferência", reviews_path %>.</div></div>
+  <div class="card" style="margin-top:18px"><div class="empty"><i class="fa-solid fa-wallet"></i><b>Nada a pagar em <%= month_label(selected_month) %></b>Os pagamentos aparecem aqui quando o mês é aprovado na <%= link_to "conferência", reviews_path %>.</div></div>
 <% end %>
 
 <% by_due.sort_by { |d, _| d || Date.new(3000) }.each do |due, list| %>

@@ -48,9 +48,15 @@ class InfluencersController < ApplicationController
     end
   end
 
+  # Desligar: só a equipe (a influenciadora nunca vê esta tela). Ela perde o acesso na hora; o histórico fica.
   def destroy
-    @influencer.update!(active: false)
-    redirect_to influencers_path, notice: "#{@influencer.name} foi desativada (histórico preservado)."
+    @influencer.deactivate!
+    redirect_to @influencer, notice: "#{@influencer.name} foi desligada: perdeu o acesso agora. O histórico continua guardado."
+  end
+
+  def reactivate
+    @influencer.reactivate!
+    redirect_to @influencer, notice: "#{@influencer.name} foi reativada. Ela já pode entrar de novo com a mesma senha."
   end
 
   # Pré-cadastro: a equipe informa só o e-mail; ela recebe o convite e cria a própria senha.

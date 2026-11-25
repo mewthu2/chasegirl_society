@@ -1,6 +1,7 @@
 require "csv"
 
-# Financeiro. "A pagar" (Admin e Gerente) = meses aprovados ainda não pagos.
+# Financeiro. "A pagar" (Admin e Gerente) = meses aprovados ainda não pagos, um mês de competência por vez
+# (como a Conferência; padrão: o mês em conferência). Os de outros meses aparecem num aviso com o link.
 # "Pagos" e registrar pagamento: só Admin.
 class StatementsController < ApplicationController
   before_action :require_staff
@@ -8,11 +9,12 @@ class StatementsController < ApplicationController
   before_action :set_statement, only: %i[pay unpay]
 
   def index
-    @statements = MonthlyStatement.payable.includes(:influencer, :reviewed_by).order(:due_on, :month).to_a
-    @statements.select! { _1.month == selected_month } if params[:mes].present?
+    payable = MonthlyStatement.payable
+    @statements = payable.for_month(selected_month).includes(:influencer, :reviewed_by).order(:due_on).to_a
+    @other_months = payable.where.not(month: selected_month).group(:month).order(:month).count
     respond_to do |format|
       format.html
-      format.csv { send_data to_csv(@statements), filename: "a-pagar-#{Date.current.strftime('%Y-%m-%d')}.csv" }
+      format.csv { send_data to_csv(@statements), filename: "a-pagar-#{selected_month.strftime('%Y-%m')}.csv" }
     end
   end
 
@@ -35,6 +37,8 @@ class StatementsController < ApplicationController
   private
 
   def set_statement = @statement = MonthlyStatement.find(params[:id])
+
+  def default_month = MonthlyStatement.review_month
 
   def to_csv(statements)
     CSV.generate(col_sep: ";") do |csv|

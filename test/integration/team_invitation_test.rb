@@ -4,7 +4,7 @@ class TeamInvitationTest < ActionDispatch::IntegrationTest
   include ActionMailer::TestHelper
 
   test "admin cadastra gerente, convite chega e ele cria a senha" do
-    post session_path, params: { email_address: users(:admin).email_address, password: "password" }
+    post session_path, params: { login: users(:admin).email_address, password: "password" }
     assert_emails 1 do
       post users_path, params: { user: { name: "Gerente Novo", email_address: "novo@chase.test", role: "manager" } }
     end

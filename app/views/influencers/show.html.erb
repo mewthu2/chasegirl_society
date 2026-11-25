@@ -6,7 +6,7 @@
   <div class="hero-row">
     <%= avatar(i.initials, size: "lg") %>
     <div>
-      <h1><%= i.name %> <% unless i.active? %><span class="chip chip-none">Inativa</span><% end %></h1>
+      <h1><%= i.name %> <% unless i.active? %><span class="chip chip-none">Desligada</span><% end %></h1>
       <p>
         <% if i.instagram %><%= link_to "@#{i.instagram}", i.instagram_url, target: "_blank", rel: "noopener" %><% end %>
         <% if i.tiktok %> · TikTok <%= link_to "@#{i.tiktok}", i.tiktok_url, target: "_blank", rel: "noopener" %><% end %>
@@ -17,6 +17,11 @@
       <%= link_to portal_path(influencer_id: i.id, mes: month_param(selected_month)), class: "btn btn-secondary" do %><%= icon("eye") %>Ver como ela vê<% end %>
       <%= link_to new_proof_path(influencer_id: i.id), class: "btn btn-secondary" do %><%= icon("plus") %>Lançar comprovação<% end %>
       <%= link_to edit_influencer_path(i), class: "btn btn-primary" do %><%= icon("pen") %>Editar<% end %>
+      <% if i.active? %>
+        <%= button_to influencer_path(i), method: :delete, class: "btn btn-ghost", form: { data: { turbo_confirm: "Desligar #{i.name}? Ela perde o acesso à área dela na hora e sai da conferência dos próximos meses. Metas, comprovações e pagamentos continuam guardados, e dá para reativar depois." } } do %><%= icon("user-slash") %>Desligar<% end %>
+      <% else %>
+        <%= button_to reactivate_influencer_path(i), class: "btn btn-secondary", form: { data: { turbo_confirm: "Reativar #{i.name}? Ela volta a entrar com a mesma senha." } } do %><%= icon("user-check") %>Reativar<% end %>
+      <% end %>
     </div>
   </div>
 </div>
@@ -70,7 +75,7 @@
               <div class="muted small">
                 <% if u.activated? %>Cadastro concluído em <%= datetime_br(u.activated_at) %>
                 <% elsif u.invited_at %>Convite enviado em <%= datetime_br(u.invited_at) %> · aguardando ela criar a senha
-                <% else %>Convite ainda não enviado<% end %>
+                <% else %>Primeiro acesso feito pelo @ · aguardando ela confirmar o e-mail<% end %>
               </div>
             </div>
             <%= u.activated? ? status_chip("approved", "Ativa") : status_chip("pending", "Pré-cadastro") %>
@@ -80,7 +85,7 @@
           <div class="field">
             <%= f.label :email_address, u ? "Alterar e-mail de login" : "E-mail da influenciadora" %>
             <%= f.email_field :email_address, value: u&.email_address, required: true, placeholder: "nome@email.com" %>
-            <span class="hint"><%= u&.activated? ? "Ela continua com a mesma senha." : "Ela recebe um convite para criar a senha e completar telefone, cidade e PIX." %></span>
+            <span class="hint"><%= u&.activated? ? "Ela continua com a mesma senha e entra com o @#{i.instagram} ou com este e-mail." : "Opcional: ela também pode fazer o primeiro acesso sozinha digitando o @#{i.instagram || '…'} na tela de login." %></span>
           </div>
           <div class="form-actions" style="justify-content:space-between">
             <% if u %>
@@ -118,9 +123,6 @@
           <dt>Telefone</dt><dd><%= i.phone.presence || "—" %></dd>
           <% if i.notes.present? %><dt>Obs.</dt><dd><%= simple_format(i.notes) %></dd><% end %>
         </dl>
-        <% if i.active? %>
-          <%= button_to "Desativar parceria", influencer_path(i), method: :delete, class: "btn btn-ghost btn-sm", form: { data: { turbo_confirm: "Desativar #{i.name}? O histórico é mantido." } } %>
-        <% end %>
       </div>
     </div>
 

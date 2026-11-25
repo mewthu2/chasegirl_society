@@ -1,0 +1,24 @@
+<div class="login">
+  <%= render "sessions/brand_side" %>
+  <section class="login-form-side">
+    <div class="login-card">
+      <div>
+        <div class="eyebrow">Primeiro acesso · 2 de 2</div>
+        <h2>Oi, <%= @influencer.name.split.first %>!</h2>
+        <p class="muted">Encontramos o seu cadastro <b>@<%= @influencer.instagram %></b>. Informe o seu e-mail e crie uma senha.</p>
+      </div>
+      <%= form_with url: first_access_register_path, class: "form", data: { turbo: false } do |f| %>
+        <%= hidden_field_tag :instagram, @influencer.instagram %>
+        <div class="field">
+          <%= label_tag :email_address, "Seu e-mail" %>
+          <%= email_field_tag :email_address, @email, required: true, autocomplete: "email", placeholder: "voce@email.com" %>
+          <span class="hint">Vamos mandar um link para confirmar. Ele também serve para recuperar a senha.</span>
+        </div>
+        <div class="field"><%= label_tag :password, "Crie uma senha" %><%= password_field_tag :password, nil, required: true, minlength: 6, maxlength: 72, autocomplete: "new-password", placeholder: "mínimo 6 caracteres" %></div>
+        <div class="field"><%= label_tag :password_confirmation, "Repita a senha" %><%= password_field_tag :password_confirmation, nil, required: true, maxlength: 72, autocomplete: "new-password" %></div>
+        <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Criar meu acesso <i class="fa-solid fa-arrow-right"></i><% end %>
+      <% end %>
+      <p class="muted small">Não é você? <%= link_to "Digitar outro @", first_access_path %></p>
+    </div>
+  </section>
+</div>

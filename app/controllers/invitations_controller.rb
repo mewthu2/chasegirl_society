@@ -29,5 +29,6 @@ class InvitationsController < ApplicationController
     return redirect_to(new_session_path, alert: "Convite inválido, expirado ou já usado. Se já criou a senha, é só entrar; senão, peça um novo convite à equipe Chase.") unless @user
 
     @influencer = @user.influencer
+    redirect_to(new_session_path, alert: ApplicationController::BLOCKED_MESSAGE) if @user.access_blocked?
   end
 end

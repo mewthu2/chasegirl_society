@@ -1,0 +1,20 @@
+<div class="login">
+  <%= render "sessions/brand_side" %>
+  <section class="login-form-side">
+    <div class="login-card">
+      <div>
+        <div class="eyebrow">Primeiro acesso · 1 de 2</div>
+        <h2>Qual é o seu @?</h2>
+        <p class="muted">Digite o seu Instagram. A equipe Chase já deixou o seu cadastro pronto.</p>
+      </div>
+      <%= form_with url: first_access_path, class: "form", data: { turbo: false } do |f| %>
+        <div class="field">
+          <%= label_tag :instagram, "@ do Instagram" %>
+          <div class="input-prefix"><span>@</span><%= text_field_tag :instagram, params[:instagram].to_s.delete_prefix("@"), required: true, autofocus: true, autocapitalize: "none", spellcheck: false, autocomplete: "off", placeholder: "seuinstagram" %></div>
+        </div>
+        <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Continuar <i class="fa-solid fa-arrow-right"></i><% end %>
+      <% end %>
+      <p class="muted small"><%= link_to "← Já tenho acesso", new_session_path(perfil: "influencer") %></p>
+    </div>
+  </section>
+</div>

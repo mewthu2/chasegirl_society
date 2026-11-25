@@ -1,0 +1,7 @@
+<% content_for :preheader, "Falta só um clique para ativar seu acesso." %>
+<% content_for :badge, "Primeiro acesso" %>
+<% content_for :hero_title, "Confirme seu e-mail, #{@influencer&.name.to_s.split.first}!" %>
+<p style="margin:0 0 6px;">Você fez o primeiro acesso à <strong>Chase Society</strong> com o Instagram <strong>@<%= @influencer&.instagram %></strong>. Para ativar sua conta, confirme que este e-mail é seu:</p>
+<%= render "shared/mail_button", url: @url, label: "Confirmar e entrar" %>
+<p style="margin:0;color:#6a6a6a;font-size:13px;">Depois disso, você entra com o seu @ (ou este e-mail) e a senha que criou. O link vale por 2 dias.</p>
+<% content_for :why, "Alguém informou este e-mail no primeiro acesso do @#{@influencer&.instagram} na Chase Society. Se não foi você, ignore: a conta não será ativada." %>

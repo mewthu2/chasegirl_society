@@ -9,10 +9,10 @@ class PasswordsController < ApplicationController
   def new; end
 
   def create
-    if (user = User.find_by(email_address: params[:email_address].to_s.strip.downcase))
+    if (user = User.find_by_login(params[:login]))
       PasswordsMailer.reset(user).deliver_now
     end
-    redirect_to new_session_path, notice: "Se o e-mail estiver cadastrado, enviamos um link para criar uma nova senha."
+    redirect_to new_session_path, notice: "Se o cadastro existir, enviamos um link para o e-mail dele para criar uma nova senha."
   rescue StandardError => e
     Rails.logger.error("[PasswordsMailer] #{e.class}: #{e.message}")
     redirect_to new_password_path, alert: "Não foi possível enviar o e-mail agora. Tente de novo em instantes."
@@ -23,7 +23,7 @@ class PasswordsController < ApplicationController
   def update
     if params[:password].to_s.length < 6
       redirect_to edit_password_path(params[:token]), alert: "A senha precisa ter pelo menos 6 caracteres."
-    elsif @user.update(params.permit(:password, :password_confirmation))
+    elsif @user.update(params.permit(:password, :password_confirmation).merge(activated_at: @user.activated_at || Time.current))
       @user.sessions.destroy_all
       redirect_to new_session_path, notice: "Senha alterada. Entre com a nova senha."
     else

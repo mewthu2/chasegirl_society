@@ -449,3 +449,18 @@ body.auth { min-height: 100vh; }
 @media (max-width: 900px) { .cycle { grid-template-columns: 1fr 1fr; } }
 
 .field input:disabled { opacity: .6; cursor: not-allowed; }
+
+/* Login: abas e primeiro acesso */
+.login-tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 4px; padding: 4px; border-radius: 12px; background: var(--surface-2); border: 1px solid var(--border); }
+.login-tabs button { display: inline-flex; align-items: center; justify-content: center; gap: 8px; height: 40px; border: 0; border-radius: 9px; background: transparent; color: var(--text-3); font-weight: 650; font-size: 13.5px; transition: background-color var(--t), color var(--t); }
+.login-tabs button:hover { color: var(--text); }
+.login-tabs button[aria-selected="true"] { background: #fff; color: #000; box-shadow: 0 4px 14px -6px rgba(255,255,255,.4); }
+.first-access { display: flex; align-items: center; gap: 12px; margin-top: 16px; padding: 14px 16px; border-radius: var(--r); border: 1px dashed #4d4d4d; background: rgba(255,255,255,.02); }
+.first-access > div { flex: 1; }
+.first-access b { display: block; font-size: 13.5px; }
+.first-access small { color: var(--text-3); font-size: 12px; }
+.input-prefix { display: flex; align-items: stretch; border: 1px solid var(--border-2); border-radius: var(--r-sm); background: #0d0d0d; overflow: hidden; }
+.input-prefix span { display: grid; place-items: center; padding: 0 12px; color: var(--text-3); background: var(--surface-2); border-right: 1px solid var(--border-2); font-weight: 700; }
+.field .input-prefix input { border: 0; border-radius: 0; background: transparent; }
+.field .input-prefix:focus-within { border-color: #9a9a9a; box-shadow: 0 0 0 3px rgba(255,255,255,.08); }
+.field .input-prefix input:focus { box-shadow: none; }

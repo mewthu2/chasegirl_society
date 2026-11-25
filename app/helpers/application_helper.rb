@@ -10,6 +10,13 @@ module ApplicationHelper
     short ? "#{name[0, 3].downcase}/#{date.strftime('%y')}" : "#{name} #{date.year}"
   end
 
+  # a***@gmail.com — mostra o suficiente para ela reconhecer o e-mail sem expor o endereço.
+  def mask_email(email)
+    local, domain = email.to_s.split("@", 2)
+    return email if domain.nil?
+    "#{local[0]}#{'*' * [local.length - 1, 3].max}@#{domain}"
+  end
+
   def month_param(date) = date.strftime("%Y-%m")
 
   def date_br(date) = date && l(date.to_date, format: "%d/%m/%Y")

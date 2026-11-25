@@ -5,7 +5,7 @@ class InvitationTest < ActionDispatch::IntegrationTest
 
   setup do
     @inf = Influencer.create!(name: "Bia Souza", feed_goal: 1, stories_goal: 4, tiktok_goal: 0, cash_value: 1000)
-    post session_path, params: { email_address: users(:admin).email_address, password: "password" }
+    post session_path, params: { login: users(:admin).email_address, password: "password" }
   end
 
   def invite!
@@ -55,8 +55,8 @@ class InvitationTest < ActionDispatch::IntegrationTest
   test "não entra antes de concluir o cadastro" do
     invite!
     delete session_path
-    post session_path, params: { email_address: "bia@email.test", password: "" }
-    assert_redirected_to new_session_path
+    post session_path, params: { login: "bia@email.test", password: "" }
+    assert_match %r{\A#{Regexp.escape(new_session_url)}}, response.location
   end
 
   test "reenviar convite manda novo e-mail" do

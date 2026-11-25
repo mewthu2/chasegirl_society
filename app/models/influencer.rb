@@ -6,14 +6,19 @@ class Influencer < ApplicationRecord
   has_many :proofs, dependent: :destroy
   has_many :monthly_statements, dependent: :destroy
 
-  normalizes :instagram, :tiktok, with: ->(v) { v.to_s.strip.delete_prefix("@").presence }
+  normalizes :instagram, with: ->(v) { v.to_s.strip.delete_prefix("@").downcase.presence }
+  normalizes :tiktok, with: ->(v) { v.to_s.strip.delete_prefix("@").presence }
   normalizes :coupon_code, with: ->(v) { v.to_s.strip.upcase.presence }
 
   validates :name, presence: true
   validates :coupon_code, uniqueness: true, allow_nil: true
+  validates :instagram, uniqueness: { case_sensitive: false, message: "já está cadastrado em outra influenciadora" }, allow_nil: true
+  validates :instagram, format: { with: /\A[a-z0-9._]+\z/, message: "deve ter só letras, números, ponto e _" }, allow_nil: true
   validates :feed_goal, :stories_goal, :tiktok_goal, numericality: { only_integer: true, greater_than_or_equal_to: 0 }
   validates :cash_value, :permuta_value, numericality: { greater_than_or_equal_to: 0 }
   validate :at_least_one_channel
+  # Desligada (pelo botão ou pelo "Parceria ativa" do cadastro): sai na hora de qualquer sessão aberta.
+  after_update_commit :end_sessions, if: -> { saved_change_to_active?(to: false) }
 
   scope :active, -> { where(active: true) }
   scope :ordered, -> { order(:name) }
@@ -46,6 +51,11 @@ class Influencer < ApplicationRecord
 
   def channel_value(kind) = channel_values.fetch(kind.to_s, 0.to_d)
 
+  def self.find_by_handle(handle)
+    h = handle.to_s.strip.delete_prefix("@").downcase
+    h.present? ? find_by(instagram: h) : nil
+  end
+
   def statement_for(month)
     monthly_statements.find_or_create_by!(month: month.to_date.beginning_of_month)
   rescue ActiveRecord::RecordNotUnique
@@ -67,7 +77,15 @@ class Influencer < ApplicationRecord
 
   def reset_channel_cache! = @channel_values = nil
 
+  # Desligar: perde o acesso à área dela na hora; metas, comprovações e histórico ficam guardados.
+  def deactivate! = update!(active: false)
+  def reactivate! = update!(active: true)
+
   private
+
+  def end_sessions
+    user&.sessions&.destroy_all
+  end
 
   def at_least_one_channel
     errors.add(:base, "Defina a meta de pelo menos um canal (Feed, Stories ou TikTok)") if channels.empty?

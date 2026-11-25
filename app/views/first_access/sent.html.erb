@@ -1,0 +1,15 @@
+<div class="login">
+  <%= render "sessions/brand_side" %>
+  <section class="login-form-side">
+    <div class="login-card">
+      <div class="dz-icon" style="width:56px;height:56px;border-radius:16px;display:grid;place-items:center;background:#fff;color:#000;font-size:22px"><%= icon("envelope-open-text") %></div>
+      <div>
+        <div class="eyebrow">Quase lá</div>
+        <h2>Confirme seu e-mail</h2>
+        <p class="muted">Enviamos um link para <b><%= @sent_to %></b>. Abra o e-mail e toque em <b>Confirmar e entrar</b> para ativar o seu acesso.</p>
+      </div>
+      <div class="callout"><%= icon("circle-info") %><span>Não chegou? Olhe a caixa de spam e a aba Promoções. Se o e-mail estiver errado, <%= link_to "faça o primeiro acesso de novo", first_access_path(instagram: @influencer.instagram) %>.</span></div>
+      <%= link_to "Ir para o login", new_session_path(perfil: "influencer", login: @influencer.instagram), class: "btn btn-secondary btn-block" %>
+    </div>
+  </section>
+</div>

@@ -1,25 +1,55 @@
+<% tab = params[:perfil] == "equipe" ? "equipe" : "influencer" %>
 <div class="login">
   <%= render "sessions/brand_side" %>
 
   <section class="login-form-side">
-    <div class="login-card">
+    <div class="login-card" data-controller="tabs">
       <div>
         <div class="eyebrow">Acesso</div>
         <h2>Entrar</h2>
-        <p class="muted">Use o e-mail e a senha que a equipe Chase enviou para você.</p>
       </div>
-      <%= form_with url: session_path, class: "form", data: { turbo: false } do |form| %>
-        <div class="field">
-          <%= form.label :email_address, "E-mail" %>
-          <%= form.email_field :email_address, required: true, autofocus: true, autocomplete: "username", placeholder: "voce@email.com", value: params[:email_address] %>
+
+      <div class="login-tabs" role="tablist">
+        <button type="button" role="tab" data-tabs-target="tab" data-tab="influencer" data-action="tabs#select" aria-selected="<%= tab == 'influencer' %>"><%= icon("camera-retro") %>Sou influencer</button>
+        <button type="button" role="tab" data-tabs-target="tab" data-tab="equipe" data-action="tabs#select" aria-selected="<%= tab == 'equipe' %>"><%= icon("user-shield") %>Sou da equipe</button>
+      </div>
+
+      <div data-tabs-target="panel" data-tab="influencer" <%= "hidden" unless tab == "influencer" %>>
+        <%= form_with url: session_path, class: "form", data: { turbo: false } do |f| %>
+          <%= hidden_field_tag :perfil, "influencer" %>
+          <div class="field">
+            <%= label_tag "login_influencer", "@ do Instagram ou e-mail" %>
+            <%= text_field_tag :login, (params[:login] if tab == "influencer"), id: "login_influencer", required: true, autofocus: tab == "influencer",
+                  autocomplete: "username", autocapitalize: "none", spellcheck: false, placeholder: "@seuinstagram" %>
+          </div>
+          <div class="field">
+            <%= label_tag "password_influencer", "Senha" %>
+            <%= password_field_tag :password, nil, id: "password_influencer", required: true, autocomplete: "current-password", maxlength: 72, placeholder: "••••••••" %>
+          </div>
+          <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
+        <% end %>
+        <div class="first-access">
+          <div><b>Primeira vez aqui?</b><small>A equipe Chase já cadastrou o seu @. Crie seu acesso em 1 minuto.</small></div>
+          <%= link_to "Primeiro acesso", first_access_path, class: "btn btn-secondary btn-sm" %>
         </div>
-        <div class="field">
-          <%= form.label :password, "Senha" %>
-          <%= form.password_field :password, required: true, autocomplete: "current-password", placeholder: "••••••••", maxlength: 72 %>
-        </div>
-        <%= form.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
-      <% end %>
-      <p class="muted small"><%= link_to "Esqueci minha senha", new_password_path %></p>
+        <p class="muted small" style="margin-top:14px"><%= link_to "Esqueci minha senha", new_password_path %></p>
+      </div>
+
+      <div data-tabs-target="panel" data-tab="equipe" <%= "hidden" unless tab == "equipe" %>>
+        <%= form_with url: session_path, class: "form", data: { turbo: false } do |f| %>
+          <%= hidden_field_tag :perfil, "equipe" %>
+          <div class="field">
+            <%= label_tag "login_equipe", "E-mail" %>
+            <%= email_field_tag :login, (params[:login] if tab == "equipe"), id: "login_equipe", required: true, autofocus: tab == "equipe", autocomplete: "username", placeholder: "voce@chasebrasil.com" %>
+          </div>
+          <div class="field">
+            <%= label_tag "password_equipe", "Senha" %>
+            <%= password_field_tag :password, nil, id: "password_equipe", required: true, autocomplete: "current-password", maxlength: 72, placeholder: "••••••••" %>
+          </div>
+          <%= f.button class: "btn btn-primary btn-lg btn-block" do %>Entrar <i class="fa-solid fa-arrow-right"></i><% end %>
+        <% end %>
+        <p class="muted small" style="margin-top:14px"><%= link_to "Esqueci minha senha", new_password_path %></p>
+      </div>
     </div>
   </section>
 </div>

@@ -19,7 +19,7 @@
       <%= f.button icon("magnifying-glass"), class: "btn btn-secondary" %>
     <% end %>
     <div class="seg">
-      <% { "ativas" => "Ativas", "inativas" => "Inativas", "todas" => "Todas" }.each do |key, label| %>
+      <% { "ativas" => "Ativas", "inativas" => "Desligadas", "todas" => "Todas" }.each do |key, label| %>
         <%= link_to label, influencers_path(status: key, q: params[:q]), class: ("is-active" if (params[:status].presence || "ativas") == key) %>
       <% end %>
     </div>

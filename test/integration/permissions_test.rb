@@ -6,7 +6,7 @@ class PermissionsTest < ActionDispatch::IntegrationTest
   end
 
   def login(user)
-    post session_path, params: { email_address: user.email_address, password: "password" }
+    post session_path, params: { login: user.email_address, password: "password" }
   end
 
   test "gerente configura metas e valores" do
@@ -53,7 +53,7 @@ class PermissionsTest < ActionDispatch::IntegrationTest
   end
 
   test "influenciadora não acessa telas da equipe" do
-    user = @inf.create_user!(email_address: "ana@x.test", password: "password", role: "influencer")
+    user = @inf.create_user!(email_address: "ana@x.test", password: "password", role: "influencer", activated_at: Time.current)
     login user
     [root_path, reviews_path, statements_path, influencers_path].each do |path|
       get path

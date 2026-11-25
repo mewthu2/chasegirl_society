@@ -16,6 +16,21 @@ class User < ApplicationRecord
     activated_at.to_i
   end
 
+  # Primeiro acesso pelo @: ela informa e-mail e senha; a conta só ativa ao clicar no link
+  # enviado para esse e-mail. O token muda se ela refizer o primeiro acesso com outro e-mail.
+  CONFIRMATION_TTL = 2.days
+  generates_token_for :email_confirmation, expires_in: CONFIRMATION_TTL do
+    [activated_at.to_i, email_address]
+  end
+
+  # Login por e-mail ou pelo @ do Instagram (influenciadoras).
+  def self.find_by_login(login)
+    value = login.to_s.strip.downcase
+    return nil if value.blank?
+    return find_by(email_address: value) if value.match?(/\A[^@\s]+@[^@\s]+\.[^@\s]+\z/)
+    Influencer.find_by_handle(value)&.user
+  end
+
   normalizes :email_address, with: ->(e) { e.strip.downcase }
 
   validates :email_address, presence: true, uniqueness: true, format: { with: URI::MailTo::EMAIL_REGEXP }
@@ -29,6 +44,8 @@ class User < ApplicationRecord
   def manager? = role == "manager"
   def staff? = STAFF_ROLES.include?(role)
   def influencer? = role == "influencer"
+  # Influenciadora desligada (parceria inativa) não entra; a equipe sempre entra.
+  def access_blocked? = influencer? && !influencer&.active?
   def role_label = ROLE_LABELS[role]
 
   # Permissões
