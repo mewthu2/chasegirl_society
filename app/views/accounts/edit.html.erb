@@ -1,6 +1,6 @@
 <% content_for :title, "Minha conta" %>
 <div class="page-head"><div><div class="eyebrow">Conta</div><h1>Minha conta</h1><p class="lead"><%= current_user.email_address %></p></div></div>
-<%= form_with url: account_path, method: :patch, class: "form", style: "max-width:640px", data: { turbo: false } do |f| %>
+<%= form_with url: account_path, method: :patch, class: "form", html: { style: "max-width:640px" }, data: { turbo: false } do |f| %>
   <div class="card"><div class="card-body form-grid">
     <div class="field span-12"><%= f.label :name, "Nome" %><%= f.text_field :name, value: current_user.name %></div>
     <div class="field span-6"><%= f.label :password, "Nova senha" %><%= f.password_field :password, autocomplete: "new-password", placeholder: "vazio mantém a atual" %></div>

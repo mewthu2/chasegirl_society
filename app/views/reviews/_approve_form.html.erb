@@ -13,7 +13,7 @@
     <% end %>
     <%= f.button class: "btn btn-primary btn-sm", data: { turbo_confirm: "Aprovar o mês de #{s.influencer.name}? Cria o a pagar e renova o cupom (+1 uso na Shopify)." } do %><%= icon("check") %>Aprovar<% end %>
   <% end %>
-  <%= form_with url: reject_review_path(s), class: "approve-form", style: "margin-top:6px" do |f| %>
+  <%= form_with url: reject_review_path(s), class: "approve-form", html: { style: "margin-top:6px" } do |f| %>
     <% unless local_assigns[:compact] %><%= f.text_field :note, placeholder: "Motivo da reprovação", style: "width:220px" %><% end %>
     <%= f.button class: "btn btn-ghost btn-sm", data: { turbo_confirm: "Reprovar o mês de #{s.influencer.name}? Não gera pagamento nem renova o cupom." } do %><%= icon("xmark") %>Reprovar<% end %>
   <% end %>
