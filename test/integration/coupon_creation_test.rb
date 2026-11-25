@@ -19,24 +19,25 @@ class CouponCreationTest < ActionDispatch::IntegrationTest
     ShopifyCoupon.singleton_class.send(:remove_method, :new)
   end
 
-  test "cadastrar influenciadora cria o cupom na Shopify com 1 uso no valor da permuta" do
+  test "cadastro da equipe não pede cupom nem cria na Shopify: fica para quando ela concluir o cadastro" do
     login users(:manager)
-    with_fake_shopify do |calls, codes|
-      post influencers_path, params: { influencer: { name: "Bia", instagram: "bia", cash_value: 1000, permuta_value: 1500, coupon_code: "cgbia" } }
-      assert_equal ["CGBIA"], codes
-      assert_equal [{ amount: 1500.to_d, usage_limit: 1 }], calls
+    get new_influencer_path
+    assert_select "input[name='influencer[coupon_code]']", 0
+    with_fake_shopify do |calls, _|
+      post influencers_path, params: { influencer: { name: "Bia", instagram: "bia", cash_value: 1000, coupon_code: "CGOUTRO" } }
+      assert_empty calls
     end
-    follow_redirect!
-    assert_match "criado na Shopify com 1 uso", flash[:notice]
+    assert_nil Influencer.order(:id).last.coupon_code
+    assert_match "CGBIA", flash[:notice]
   end
 
-  test "falha na Shopify não impede o cadastro e avisa" do
+  test "trocar o cupom na edição cria na Shopify; falha avisa sem impedir" do
+    inf = Influencer.create!(name: "Ana", instagram: "ana", feed_goal: 1, stories_goal: 0, tiktok_goal: 0, cash_value: 1000)
     login users(:manager)
     with_fake_shopify(error: "sem permissão") do
-      assert_difference("Influencer.count", 1) do
-        post influencers_path, params: { influencer: { name: "Bia", instagram: "bia", coupon_code: "CGBIA" } }
-      end
+      patch influencer_path(inf), params: { influencer: { coupon_code: "CGANA" } }
     end
+    assert_equal "CGANA", inf.reload.coupon_code
     assert_match "NÃO foi criado na Shopify: sem permissão", flash[:alert]
   end
 

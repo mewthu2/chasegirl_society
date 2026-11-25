@@ -21,7 +21,11 @@
       <div class="span-12 callout"><%= icon("divide") %><span>O cachê é dividido igualmente entre os canais com meta: com Feed, Stories e TikTok cada um vale 33,33%; sem TikTok, 50% cada. Cada canal cumprido no mês libera a sua parte.</span></div>
       <div class="field span-4"><%= f.label :cash_value, "Cachê mensal (PIX) R$" %><%= f.number_field :cash_value, step: "0.01", min: 0 %></div>
       <div class="field span-4"><%= f.label :permuta_value, "Permuta (valor do cupom) R$" %><%= f.number_field :permuta_value, step: "0.01", min: 0 %></div>
-      <div class="field span-4"><%= f.label :coupon_code, "Cupom na Shopify" %><%= f.text_field :coupon_code, class: "mono", placeholder: "CGNOME" %><span class="hint">Criado na Shopify com 1 uso; cada mês cumprido = +1 uso</span></div>
+      <% if f.object.new_record? %>
+        <div class="field span-4"><label>Cupom na Shopify</label><div class="mono" style="padding:8px 0">CG + @ do Instagram</div><span class="hint">Criado sozinho quando ela concluir o cadastro, com 1 uso; cada mês cumprido = +1 uso</span></div>
+      <% else %>
+        <div class="field span-4"><%= f.label :coupon_code, "Cupom na Shopify" %><%= f.text_field :coupon_code, class: "mono", placeholder: f.object.default_coupon_code || "CGNOME" %><span class="hint">Em branco: gerado sozinho (CG + @) quando ela concluir o cadastro</span></div>
+      <% end %>
       <div class="field span-4" style="justify-content:flex-end"><label class="check"><%= f.check_box :cash_is_permuta %> Só permuta (sem cachê em dinheiro)</label></div>
     </div>
   </div>

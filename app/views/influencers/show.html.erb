@@ -107,7 +107,7 @@
       <div class="card-body" style="display:grid;gap:16px">
         <div class="coupon">
           <span class="ic"><%= icon("ticket") %></span>
-          <div style="flex:1"><div class="muted small">Cupom · permuta de <%= brl(i.permuta_value) %></div><div class="code"><%= i.coupon_code || "—" %></div></div>
+          <div style="flex:1"><div class="muted small">Cupom · permuta de <%= brl(i.permuta_value) %></div><div class="code"><%= i.coupon_code || tag.span("#{i.default_coupon_code || 'CG + @'} · criado ao concluir o cadastro", class: "muted small") %></div></div>
           <% if i.coupon_code || i.default_coupon_code %><%= button_to icon("rotate"), coupon_influencer_path(i), class: "icon-btn", title: "Consultar na Shopify (cria com 1 uso se ainda não existir)" %><% end %>
         </div>
         <div>

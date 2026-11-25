@@ -27,9 +27,10 @@ class InfluencersController < ApplicationController
   end
 
   def create
-    @influencer = Influencer.new(influencer_params)
+    # O cupom não é informado no cadastro: é gerado (CG + @) quando ela conclui o cadastro.
+    @influencer = Influencer.new(influencer_params.except(:coupon_code))
     if @influencer.save
-      redirect_to @influencer, **with_coupon("Influenciadora cadastrada. Agora crie o acesso dela.")
+      redirect_to @influencer, notice: "Influenciadora cadastrada. Agora crie o acesso dela: o cupom #{@influencer.default_coupon_code || 'CG + @'} é criado quando ela concluir o cadastro."
     else
       render :new, status: :unprocessable_entity
     end
