@@ -6,7 +6,7 @@
   <div>
     <div class="eyebrow"><%= month_label(p.month) %></div>
     <h1><%= p.kind_label %> <%= status_chip(p.status, p.status_label) %></h1>
-    <p class="lead"><%= p.influencer.name %> · publicado em <%= date_br(p.posted_on) || "—" %> · enviado em <%= datetime_br(p.created_at) %><%= " por #{p.submitted_by.display_name}" if p.submitted_by %></p>
+    <p class="lead"><%= p.influencer.name %> · referente a <%= month_label(p.month) %> · enviado em <%= datetime_br(p.created_at) %><%= " por #{p.submitted_by.display_name}" if p.submitted_by %></p>
   </div>
   <div class="actions">
     <% if staff? || p.pending? %>

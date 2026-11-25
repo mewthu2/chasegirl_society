@@ -16,8 +16,10 @@ class ProofsController < ApplicationController
   def show; end
 
   def new
-    @proof = Proof.new(influencer: default_influencer, kind: params[:kind].presence || "stories",
-                       posted_on: Date.current)
+    influencer = default_influencer
+    channels = influencer&.channels || Influencer::CHANNELS
+    month = selected_month if params[:mes].present? && Proof.month_options(influencer).include?(selected_month)
+    @proof = Proof.new(influencer:, kind: params[:kind].presence_in(channels) || channels.first, month:)
   end
 
   def create
@@ -27,9 +29,6 @@ class ProofsController < ApplicationController
     if @proof.save
       @proof.approve!(by: current_user) if staff? && params[:approve_now] == "1"
       redirect_to after_save_path, notice: "Comprovação enviada! A equipe Chase vai conferir."
-    elsif params[:return_to] == "portal"
-      redirect_to portal_path(influencer_id: (@proof.influencer_id if staff?), mes: params[:mes], kind: @proof.kind, anchor: "comprovar"),
-                  alert: "Não enviada: #{@proof.errors.full_messages.to_sentence}"
     else
       render :new, status: :unprocessable_entity
     end
@@ -85,7 +84,7 @@ class ProofsController < ApplicationController
   end
 
   def proof_params
-    params.require(:proof).permit(:kind, :posted_on, :month, :link, :description, images: [])
+    params.require(:proof).permit(:kind, :month, :link, :description, images: [])
   end
 
   def after_save_path

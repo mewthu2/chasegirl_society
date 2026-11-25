@@ -44,14 +44,14 @@
       <div class="card-head"><h2>Comprovações</h2><div class="actions"><%= link_to "Filtrar", proofs_path(influencer_id: i.id, status: "todas"), class: "btn btn-ghost btn-sm" %></div></div>
       <div class="table-wrap">
         <table class="table">
-          <thead><tr><th>Prova</th><th>Canal</th><th>Competência</th><th>Postado</th><th>Situação</th></tr></thead>
+          <thead><tr><th>Prova</th><th>Canal</th><th>Competência</th><th>Enviado</th><th>Situação</th></tr></thead>
           <tbody>
             <% @proofs.each do |p| %>
               <tr>
                 <td><%= link_to proof_path(p), class: "thumbs" do %><% p.images.first(3).each do |img| %><span class="more" style="padding:0"><%= media_thumb(img) %></span><% end %><% if p.images.none? %><span class="more"><%= icon("link") %></span><% end %><% end %></td>
                 <td><%= p.kind_label %></td>
                 <td><%= month_label(p.month, short: true) %></td>
-                <td><%= date_br(p.posted_on) %></td>
+                <td><%= date_br(p.created_at) %></td>
                 <td><%= status_chip(p.status, p.status_label) %></td>
               </tr>
             <% end %>

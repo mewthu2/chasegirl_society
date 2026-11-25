@@ -16,17 +16,11 @@
     </div>
     <div class="actions">
       <%= month_switcher(:portal_path, **extra) %>
-      <%= link_to "#comprovar", class: "btn btn-primary btn-lg" do %><%= icon("camera") %>Enviar fotos<% end %>
     </div>
   </div>
 </div>
 
-<%= render "shared/channels", statement: s, upload_link: ->(kind) { portal_path(extra.merge(mes: month_param(selected_month), kind:, anchor: "comprovar")) } %>
-
-<div id="comprovar" style="margin-top:18px;scroll-margin-top:80px">
-  <%= render "proofs/form", portal: true,
-        proof: Proof.new(influencer: i, kind: (params[:kind].presence_in(i.channels) || i.channels.first), posted_on: Date.current) %>
-</div>
+<%= render "shared/channels", statement: s %>
 
 <div class="card" style="margin-top:16px">
   <div class="card-head">
@@ -44,7 +38,7 @@
   <% if @proofs.any? %>
     <div class="card-body"><div class="proof-cards"><%= render partial: "proofs/card", collection: @proofs, as: :proof %></div></div>
   <% else %>
-    <div class="empty"><i class="fa-regular fa-images"></i><b>Nenhum envio neste mês</b>Toque em "Enviar comprovação" para mandar seus prints.</div>
+    <div class="empty"><i class="fa-regular fa-images"></i><b>Nenhum envio neste mês</b>Os envios do mês aparecem aqui.</div>
   <% end %>
 </div>
 

@@ -9,7 +9,7 @@ o sistema calcula o cachê do mês e libera +1 uso no cupom da Shopify quando a 
   Cada canal cumprido no mês (comprovações aprovadas ≥ meta) libera a sua parte.
 - **Permuta** = valor do cupom. Quando todas as metas do mês são batidas, o `usageLimit` do código de desconto
   na Shopify aumenta em 1 (uma vez por mês). Se falhar, o botão "Liberar cupom" em Financeiro › A pagar tenta de novo.
-- **Comprovação** exige link da publicação **e** foto. A influenciadora lança direto na "Minha área".
+- **Comprovação** é por mês de referência (o atual ou o anterior, enquanto não aprovado). Feed = link; Stories = print; TikTok = link e print. A influenciadora envia em "Enviar comprovação"; a "Minha área" é só o painel.
 - **Pré-cadastro**: na ficha da influenciadora a equipe informa só o e-mail; ela recebe um convite (vale 7 dias, uso único)
   para criar a senha e completar telefone, cidade e PIX. "Reenviar convite" na ficha; depois de ativa, vira "enviar link de nova senha".
 - **Esqueci minha senha** no login, com link por e-mail.

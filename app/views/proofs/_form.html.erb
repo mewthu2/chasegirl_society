@@ -1,16 +1,21 @@
-<%# locals: proof, portal (true quando embutido na Minha área) %>
-<% portal = local_assigns.fetch(:portal, false) %>
-<%= form_with model: proof, class: "form", data: { controller: "upload" } do |f| %>
-  <%= render "shared/errors", record: proof unless portal %>
-  <%= hidden_field_tag :return_to, portal ? "portal" : params[:return_to] %>
-  <%= hidden_field_tag :mes, month_param(selected_month) if portal %>
+<%# locals: proof %>
+<%= form_with model: proof, class: "form",
+      data: { controller: "upload proof-kind", proof_kind_link_value: Proof::LINK_KINDS.to_json, proof_kind_photo_value: Proof::PHOTO_KINDS.to_json, proof_kind_new_value: proof.new_record? } do |f| %>
+  <%= render "shared/errors", record: proof %>
+  <%= hidden_field_tag :return_to, params[:return_to] %>
 
   <div class="card">
     <div class="card-head">
-      <h2><%= portal ? "Comprovar combinados" : "O que você está comprovando?" %></h2>
-      <% if portal %><span class="muted small" style="margin-left:auto">Uma tarefa por envio · link + fotos obrigatórios</span><% end %>
+      <h2>O que você está comprovando?</h2>
+      <span class="muted small" style="margin-left:auto">Uma tarefa por envio</span>
     </div>
     <div class="card-body form-grid">
+      <% months = (Proof.month_options(proof.influencer) | [proof.month&.beginning_of_month].compact).sort %>
+      <div class="field span-12">
+        <%= f.label :month, "Mês de referência *" %>
+        <%= f.select :month, months.map { |m| [month_label(m), m.to_s] }, { selected: (proof.month || months.last)&.to_s } %>
+        <span class="hint">A entrega conta para a meta deste mês</span>
+      </div>
       <% if staff? && proof.new_record? %>
         <% if proof.influencer %>
           <%= f.hidden_field :influencer_id %>
@@ -25,27 +30,26 @@
       <div class="span-12 kind-picker">
         <% Influencer::CHANNELS.each do |k| %>
           <div class="kind-option">
-            <%= f.radio_button :kind, k, disabled: !contracted.include?(k), required: true %>
+            <%= f.radio_button :kind, k, disabled: !contracted.include?(k), required: true, data: { action: "change->proof-kind#update" } %>
             <label for="proof_kind_<%= k %>">
               <%= icon(channel_icon(k)) %>
               <b><%= Influencer.channel_label(k) %></b>
-              <small><%= { "feed" => "Post no feed ou Reels", "stories" => "Um story por envio", "tiktok" => "Vídeo publicado no TikTok" }[k] %><%= " · não contratado" unless contracted.include?(k) %></small>
+              <small><%= Proof::KIND_HINTS[k] %><%= " · não contratado" unless contracted.include?(k) %></small>
             </label>
           </div>
         <% end %>
       </div>
-      <div class="field span-8"><%= f.label :link, "Link da publicação *" %><%= f.text_field :link, required: true, inputmode: "url", placeholder: "https://instagram.com/…" %><span class="hint">Copie o link do post, reels, story ou TikTok</span></div>
-      <div class="field span-4"><%= f.label :posted_on, "Data da publicação" %><%= f.date_field :posted_on, max: Date.current %></div>
+      <div class="field span-12" data-proof-kind-target="linkField"><%= f.label :link, "Link da publicação *" %><%= f.text_field :link, inputmode: "url", placeholder: "https://…", data: { proof_kind_target: "linkInput" } %><span class="hint">Copie o link do post, reels ou TikTok</span></div>
 
-      <div class="span-12">
+      <div class="span-12" data-proof-kind-target="photoField">
         <% if proof.persisted? && proof.images.attached? %>
           <div class="gallery" style="margin-bottom:14px"><% proof.images.each do |img| %><%= link_to media_thumb(img), url_for(img), target: "_blank" %><% end %></div>
         <% end %>
         <div class="dropzone" data-upload-target="zone" data-action="dragover->upload#over dragleave->upload#leave drop->upload#leave">
           <div class="dz-icon"><%= icon("camera") %></div>
-          <b>Toque para adicionar as fotos *</b>
+          <b>Toque para adicionar os prints <span data-proof-kind-target="photoMark">*</span></b>
           <small>Quantas fotos precisar para comprovar esta tarefa (prints, fotos do post, telas do vídeo) · até <%= Proof::MAX_IMAGES %></small>
-          <%= f.file_field :images, multiple: true, accept: "image/*,video/*", required: proof.new_record?, data: { upload_target: "input", action: "change->upload#changed" } %>
+          <%= f.file_field :images, multiple: true, accept: "image/*,video/*", data: { upload_target: "input", proof_kind_target: "photoInput", action: "change->upload#changed" } %>
         </div>
         <div class="previews" data-upload-target="previews"></div>
         <span class="uploading" style="margin-top:10px"><span class="spinner"></span>Preparando as fotos…</span>
@@ -55,8 +59,8 @@
   </div>
 
   <div class="form-actions">
-    <% if staff? && proof.new_record? && !portal %><label class="check" style="margin-right:auto"><%= check_box_tag :approve_now, "1", false %> Já aprovar ao salvar</label><% end %>
-    <% unless portal %><%= link_to "Cancelar", proof.persisted? ? proof_path(proof) : (staff? ? proofs_path : portal_path), class: "btn btn-ghost" %><% end %>
+    <% if staff? && proof.new_record? %><label class="check" style="margin-right:auto"><%= check_box_tag :approve_now, "1", false %> Já aprovar ao salvar</label><% end %>
+    <%= link_to "Cancelar", proof.persisted? ? proof_path(proof) : (staff? ? proofs_path : portal_path), class: "btn btn-ghost" %>
     <%= f.button class: "btn btn-primary btn-lg", data: { upload_target: "submit", turbo_submits_with: "Enviando…" } do %><%= icon("paper-plane") %><%= proof.persisted? ? "Salvar" : "Enviar comprovação" %><% end %>
   </div>
 <% end %>
