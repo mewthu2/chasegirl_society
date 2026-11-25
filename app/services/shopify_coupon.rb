@@ -71,7 +71,7 @@ class ShopifyCoupon
       combinesWith: { orderDiscounts: false, productDiscounts: false, shippingDiscounts: false },
       customerGets: {
         value: { discountAmount: { amount: format("%.2f", amount.to_d), appliesOnEachItem: false } },
-        items: { all: true }, appliesOnOneTimePurchase: true
+        items: { all: true }
       }
     }
     errors = graphql(CREATE, input:).dig("discountCodeBasicCreate", "userErrors")
